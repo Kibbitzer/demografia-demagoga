@@ -621,11 +621,13 @@
       });
     }
 
-    var somaCand = 0, somaPct = 0;
+    var somaCand = 0, somaPct = 0, somaPop = 0;
     raRows.forEach(function (r) {
       if (num(r.candidatos)) somaCand += r.candidatos;
       if (num(r.pct)) somaPct += r.pct;
+      if (num(r.populacao)) somaPop += r.populacao;
     });
+    setText($('#table-ra-total-pop'), fmtInt.format(somaPop));
     setText($('#table-ra-total'), fmtInt.format(Math.round(somaCand)));
     setText($('#table-ra-total-pct'), raRows.length ? fmt1.format(somaPct) + '%' : '—');
   }

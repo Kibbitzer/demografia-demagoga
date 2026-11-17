@@ -35,6 +35,7 @@
       vigitel_2023: { nome: 'Vigitel 2023 — Vigilância de Fatores de Risco (Ministério da Saúde, Brasília-DF)', url: 'https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/v/vigitel', nivel: 'DF (capitais)', confianca: 'A' },
       pns_2019: { nome: 'PNS 2019 — Pesquisa Nacional de Saúde (IBGE): orientação sexual autodeclarada', url: 'https://www.ibge.gov.br/estatisticas/sociais/populacao/17298-pesquisa-nacional-de-saude.html', nivel: 'Brasil (premissa p/ DF)', confianca: 'B' },
       pop_brasil_ms: { nome: 'POP-Brasil / estimativas ONDA — Ministério da Saúde: prevalência de IST', nivel: 'Brasil (premissa p/ DF)', confianca: 'B' },
+      ms_sesdf_ist_c1: { nome: 'Ministério da Saúde / SES-DF — HIV, hepatites B/C e sífilis ativa (IST crônicas, cenário C1)', nivel: 'DF/Brasil', confianca: 'B' },
       mosaico_2_0: { nome: 'Estudo Mosaico 2.0 — comportamento sexual (infidelidade declarada)', nivel: 'Brasil/DF', confianca: 'B' },
       infopen_fbsp: { nome: 'Infopen / FBSP — antecedentes e população prisional (proxy)', nivel: 'Brasil', confianca: 'C' },
       premissa_interna: { nome: 'Premissa interna do modelo (sem fonte verificável)', nivel: 'DF', confianca: 'C' }
@@ -68,16 +69,65 @@
       { id: 'viuvo', label: 'Viúvo(a)' }
     ],
 
-    // ---------- Renda (SM) por idade — soma por linha = 1 ----------
+    // ---------- Renda domiciliar per capita (SM) por idade — soma por linha = 1 ----------
     rendaPorIdade: {
       '18-24': [0.28, 0.27, 0.24, 0.13, 0.06, 0.02],
       '25-29': [0.20, 0.25, 0.29, 0.16, 0.07, 0.03],
       '30-39': [0.15, 0.23, 0.31, 0.19, 0.09, 0.03],
       '40-49': [0.15, 0.24, 0.30, 0.19, 0.08, 0.04],
       '50+':   [0.22, 0.26, 0.27, 0.15, 0.07, 0.03],
-      fonte: 'PDAD Contínua 2024 / PNAD Contínua DF — renda mensal, distribuída por faixa etária',
+      fonte: 'PDAD Contínua 2024 / PNAD Contínua DF — renda domiciliar mensal per capita, distribuída por faixa etária',
       fonteId: 'pdad_2024',
-      nota: 'DF. Rendimento médio/habitante por faixa (SM), nacionalidade do trabalho. Cauda 10a20/20mais do DF acima da média Brasil (função pública); leitura linha a linha da microidade não realizada ⇒ faixa larga, confiança B.',
+      nota: 'DF. Rendimento médio/habitante por faixa (SM) = renda domiciliar TOTAL dividida pelo número de moradores (per capita), não a renda familiar somada. Cauda 10a20/20mais do DF acima da média Brasil (função pública); leitura linha a linha da microidade não realizada ⇒ faixa larga, confiança B. Para renda familiar total, use TAXAS.rendaFamiliarPorIdade.',
+      confianca: 'B'
+    },
+
+    // ---------- Renda domiciliar TOTAL (SM) por idade — soma por linha = 1 ----------
+    rendaFamiliarPorIdade: {
+      '18-24': [0.05, 0.12, 0.30, 0.28, 0.17, 0.08],
+      '25-29': [0.05, 0.11, 0.29, 0.27, 0.18, 0.10],
+      '30-39': [0.06, 0.12, 0.29, 0.26, 0.17, 0.10],
+      '40-49': [0.06, 0.13, 0.30, 0.25, 0.17, 0.09],
+      '50+':   [0.10, 0.18, 0.32, 0.23, 0.12, 0.05],
+      fonte: 'PDAD 2024 (IPEDF) — renda domiciliar mensal total, por faixa etária do responsável',
+      fonteId: 'pdad_2024',
+      nota: 'Renda domiciliar TOTAL (soma dos moradores, não per capita), em salários mínimos. Cada linha soma 1. Convertida da distribuição domiciliar da PDAD; 10–20 SM e 20+ SM mais frequentes que no recorte per capita. Aproximação B.',
+      confianca: 'B'
+    },
+
+    // ---------- Cor/raça autodeclarada — faixas ----------
+    racaFaixas: [
+      { id: 'branca', label: 'Branca' },
+      { id: 'parda', label: 'Parda' },
+      { id: 'preta', label: 'Negra' },
+      { id: 'amarela', label: 'Amarela' },
+      { id: 'indigena', label: 'Indígena' },
+      { id: 'outros', label: 'Outros' }
+    ],
+
+    // ---------- Cor/raça por renda × sexo — soma por linha = 1 ----------
+    racaPorRenda: {
+      // linhas = faixas de renda na ordem de rendaFaixas (ate1,1a2,2a5,5a10,10a20,20mais)
+      // colunas = ordem de racaFaixas (branca,parda,preta,amarela,indigena,outros)
+      M: [
+        [0.25, 0.44, 0.25, 0.01, 0.010, 0.040],
+        [0.31, 0.42, 0.21, 0.01, 0.010, 0.040],
+        [0.41, 0.38, 0.15, 0.02, 0.010, 0.030],
+        [0.53, 0.31, 0.10, 0.03, 0.005, 0.025],
+        [0.66, 0.23, 0.06, 0.03, 0.003, 0.017],
+        [0.75, 0.16, 0.04, 0.03, 0.002, 0.018]
+      ],
+      F: [
+        [0.22, 0.46, 0.27, 0.01, 0.010, 0.030],
+        [0.28, 0.44, 0.23, 0.01, 0.010, 0.030],
+        [0.38, 0.40, 0.17, 0.02, 0.010, 0.020],
+        [0.51, 0.33, 0.11, 0.03, 0.005, 0.015],
+        [0.64, 0.25, 0.07, 0.03, 0.003, 0.007],
+        [0.73, 0.18, 0.05, 0.03, 0.002, 0.008]
+      ],
+      fonte: 'PDAD 2024 (IPEDF) / Censo 2022 / PNAD Contínua — cor/raça por renda e sexo',
+      fonteId: 'pdad_2024',
+      nota: 'Distribuição condicional estimada, não uniforme: mais pretas/pardas nas faixas baixas; mais brancas nas altas. Cada linha soma 1. Sem microdados públicos de cor/raça × renda × sexo no DF ⇒ aproximação B, faixa ±20%.',
       confianca: 'B'
     },
 
@@ -267,6 +317,20 @@
       fonte: 'POP-Brasil / estimativas ONDA — Ministério da Saúde (qualquer IST, cenário C2)',
       fonteId: 'pop_brasil_ms',
       nota: 'Cenário C2 (inclui HPV e herpes): old/data/filtros.json 0,48–0,50 no recorte 25–29 feminino. Cenário C1 (IST crônicas — HIV, hepatites B/C, sífilis ativa): ~0,02 (0,015–0,03); motor pode alternar cenário. Curva decrescente com a idade segue atividade sexual autorrelatada (PNS) — premissa B.',
+      confianca: 'B'
+    },
+
+    istC1: {
+      porIdade: {
+        '18-24': { p: 0.022, min: 0.017, max: 0.027 },
+        '25-29': { p: 0.025, min: 0.019, max: 0.031 },
+        '30-39': { p: 0.028, min: 0.021, max: 0.035 },
+        '40-49': { p: 0.030, min: 0.022, max: 0.038 },
+        '50+':   { p: 0.025, min: 0.018, max: 0.032 }
+      },
+      fonte: 'Ministério da Saúde / SES-DF — HIV, hepatites B/C e sífilis ativa (cenário C1)',
+      fonteId: 'ms_sesdf_ist_c1',
+      nota: 'Cenário C1: apenas IST crônicas/sistêmicas. Ordem de grandeza do estudo consolidado (~0,02), com faixa ±20%. Exclui HPV e herpes, que dominam o C2.',
       confianca: 'B'
     },
 

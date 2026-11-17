@@ -1,6 +1,7 @@
 /**
  * charts.js — Gráficos Chart.js 4 (Fase 2, PLAN §4/§5).
- * API: window.Charts = { renderRA(porRA), renderAparencia(notaMin), destroy() }
+ * API: window.Charts = { renderRA(porRA), renderFunil(stages), renderAparencia(notaMin), destroy() }
+ * stages: [{ id, label, total, delta, deltaPct, pctBase }]
  * Requer assets/vendor/chart.umd.min.js carregado antes; sem Chart.js → fallback CSS/textual.
  * Sem estado global além do registro de instâncias. Sem fetch. Sem type=module.
  */
@@ -206,6 +207,128 @@
     });
   }
 
+  // ---------- renderFunil: barras horizontais (funil) ----------
+
+  function quedaAbs(arr, i) {
+    var s = arr[i];
+    if (typeof s.delta === 'number' && isFinite(s.delta)) return s.delta;
+    var p = arr[i - 1];
+    return p ? Math.max(0, p.total - s.total) : 0;
+  }
+
+  function quedaPct(arr, i) {
+    var s = arr[i];
+    if (typeof s.deltaPct === 'number' && isFinite(s.deltaPct)) return s.deltaPct;
+    var p = arr[i - 1];
+    return (p && p.total) ? 100 * quedaAbs(arr, i) / p.total : 0;
+  }
+
+  function pctBase(arr, i) {
+    var s = arr[i];
+    if (typeof s.pctBase === 'number' && isFinite(s.pctBase)) return s.pctBase;
+    var b = arr[0];
+    return (b && b.total) ? 100 * s.total / b.total : 0;
+  }
+
+  function fallbackFunil(arr) {
+    var canvas = canvasFor('chart-funil');
+    if (!canvas) return;
+    var fb = fallbackDiv(canvas);
+    arr.forEach(function (s, i) {
+      var line = el('div', { display: 'flex', alignItems: 'center', gap: '8px', lineHeight: '1.4' });
+      line.appendChild(el('span', { flex: '0 0 40%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }, s.label));
+      line.appendChild(el('span', { flex: '0 0 auto' }, nfInt.format(s.total)));
+      if (i > 0) line.appendChild(el('span', { flex: '1 1 auto', textAlign: 'right', color: varColor('--muted', '#64748b') },
+        '−' + nfInt.format(quedaAbs(arr, i)) + ' (−' + nf1.format(quedaPct(arr, i)) + '%)'));
+      fb.appendChild(line);
+    });
+  }
+
+  function noticeFunil(arr) {
+    var canvas = canvasFor('chart-funil');
+    if (!canvas) return;
+    destroyOn(canvas);
+    var fb = fallbackDiv(canvas);
+    fb.appendChild(el('p', { margin: '0' }, 'Ative filtros para ver o funil.'));
+  }
+
+  function renderFunil(stages) {
+    var canvas = canvasFor('chart-funil');
+    if (!canvas) return;
+
+    var arr = (Array.isArray(stages) ? stages : []).filter(function (s) {
+      return s && typeof s.total === 'number' && isFinite(s.total) && s.label != null;
+    });
+
+    // altura do container antes de criar o gráfico: max(220, n*44)
+    var wrap = (canvas.closest && canvas.closest('.chart-wrap-funil')) || canvas.parentNode;
+    if (wrap && wrap.style) wrap.style.height = Math.max(220, arr.length * 44) + 'px';
+
+    if (arr.length <= 1) { noticeFunil(arr); return; }
+    if (!W.Chart) { fallbackFunil(arr); return; }
+    clearFallback(canvas);
+    destroyOn(canvas);
+
+    var indigo = varColor('--indigo', '#6366f1');
+    var emerald = varColor('--emerald', '#10b981');
+    var border = varColor('--border', '#e2e8f0');
+    var muted = varColor('--muted', '#64748b');
+
+    var n = arr.length;
+    var bg = arr.map(function (s, i) {
+      return i === n - 1 ? alpha(emerald, 0.8) : alpha(indigo, 0.85 - 0.5 * i / (n - 1));
+    });
+    var br = arr.map(function (s, i) { return i === n - 1 ? emerald : indigo; });
+
+    instances[canvas.id] = new W.Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: arr.map(function (s) { return s.label; }),
+        datasets: [{
+          label: 'Pessoas',
+          data: arr.map(function (s) { return s.total; }),
+          backgroundColor: bg,
+          borderColor: br,
+          borderWidth: 1,
+          borderRadius: 3,
+          barPercentage: 0.85
+        }]
+      },
+      options: {
+        indexAxis: 'y', // primeiro estágio no topo (ordem natural do eixo y)
+        responsive: true,
+        maintainAspectRatio: false, // altura controlada por JS/CSS (.chart-wrap-funil)
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: alpha(border, 0.9), drawTicks: false },
+            border: { display: false },
+            ticks: { color: muted, callback: function (v) { return nfInt.format(v); } }
+          },
+          y: {
+            grid: { display: false },
+            border: { display: false },
+            ticks: { color: varColor('--slate', '#334155'), font: { size: 11 } }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function (ctx) {
+                var i = ctx.dataIndex, s = arr[i], out = ['Total: ' + nfInt.format(s.total)];
+                if (i > 0) out.push('Queda vs anterior: −' + nfInt.format(quedaAbs(arr, i)) +
+                  ' (−' + nf1.format(quedaPct(arr, i)) + '%)');
+                out.push('% da base inicial: ' + nf1.format(pctBase(arr, i)) + '%');
+                return out;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
   // ---------- renderAparencia: curva normal + cauda ----------
 
   function pontos() {
@@ -312,6 +435,7 @@
 
   W.Charts = {
     renderRA: renderRA,
+    renderFunil: renderFunil,
     renderAparencia: renderAparencia,
     destroy: destroy
   };

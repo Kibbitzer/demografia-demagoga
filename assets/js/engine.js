@@ -15,8 +15,9 @@
  *  - multi: todas as opções marcadas (ou nenhuma) → 1; senão soma das probabilidades
  *    marcadas, renormalizada pela soma das resolvíveis (nunca multiplica dentro do bloco).
  *  - eixos conjuntos do modelo: multi com rateKey rendaPorIdade × escolaridadePorIdade
- *    aplica a matriz TAXAS.rendaEduBase UMA vez, inclinada por rendaIdx/educIdx da RA
- *    e renormalizada; multi estadoCivilPorIdade × tri-state filhosPorIdade aplica a
+ *    aplica a matriz TAXAS.rendaEduBase UMA vez, reweight pela base de renda (escopo),
+ *    inclinada por rendaIdx/educIdx da RA e renormalizada; multi estadoCivilPorIdade ×
+ *    tri-state filhosPorIdade aplica a
  *    matriz conjunta TAXAS.estadoCivilFilhos (condicional × margem). Qualquer outro
  *    par de filtros com o mesmo rateKey é tratado como independente (premissa
  *    documentada em TAXAS.meta.nota).
@@ -111,7 +112,7 @@
 
   // ---------- tabelas derivadas com cache ----------
 
-  var _cache = { sig: null, faixas: null, faixaBounds: null, listasIds: null, celulas: null, idxOfIdade: null, fIdxDeIdade: null, juntaRD: [] };
+  var _cache = { sig: null, faixas: null, faixaBounds: null, listasIds: null, celulas: null, idxOfIdade: null, fIdxDeIdade: null, juntaRD: {} };
 
   function faixasList() {
     if (_cache.faixas) return _cache.faixas;
@@ -205,12 +206,27 @@
     return arr;
   }
 
-  // junta renda(6)×escolaridade(5) por faixa, inclinada por rendaIdx/educIdx da RA e renormalizada (soma 1).
-  // Linhas na ordem de TAXAS.rendaFaixas, colunas na ordem de TAXAS.escolaridadeFaixas.
-  function juntaRD(fIdx) {
-    if (_cache.juntaRD[fIdx]) return _cache.juntaRD[fIdx];
-    var base = W.TAXAS[RENDA_EDU_KEYS.matriz] && W.TAXAS[RENDA_EDU_KEYS.matriz][faixasList()[fIdx]];
+  // junta renda(6)×escolaridade(5) por faixa, reweight pela base de renda (escopo), inclinada por
+  // rendaIdx/educIdx da RA e renormalizada (soma 1). Linhas na ordem de TAXAS.rendaFaixas,
+  // colunas na ordem de TAXAS.escolaridadeFaixas.
+  function juntaRD(fIdx, escopo) {
+    var chave = fIdx + '|' + escopo;
+    if (_cache.juntaRD[chave]) return _cache.juntaRD[chave];
+    var faixa = faixasList()[fIdx];
+    var base = W.TAXAS[RENDA_EDU_KEYS.matriz] && W.TAXAS[RENDA_EDU_KEYS.matriz][faixa];
     if (!Array.isArray(base)) return null;
+    // base "familiar": inclina as linhas da matriz pela razão renda total / renda per capita
+    if (escopo === 'familiar' && W.TAXAS.rendaFamiliarPorIdade) {
+      var fam = W.TAXAS.rendaFamiliarPorIdade[faixa];
+      var pc = W.TAXAS[RENDA_EDU_KEYS.renda] && W.TAXAS[RENDA_EDU_KEYS.renda][faixa];
+      if (Array.isArray(fam) && Array.isArray(pc)) {
+        base = base.map(function (row, i) {
+          var ratio = fam[i] / pc[i];
+          if (!num(ratio) || ratio < 0) return row;
+          return row.map(function (v) { return v * ratio; });
+        });
+      }
+    }
     var R = W.DATA_RAS.lista, out = [];
     for (var ri = 0; ri < R.length; ri++) {
       var rIdx = R[ri].rendaIdx, eIdx = R[ri].educIdx, s = 0;
@@ -220,7 +236,7 @@
       if (s > 0) mat = mat.map(function (row) { return row.map(function (v) { return v / s; }); });
       out.push(mat);
     }
-    _cache.juntaRD[fIdx] = out;
+    _cache.juntaRD[chave] = out;
     return out;
   }
 
@@ -390,11 +406,18 @@
     var sig = CFG.length + '|' + Object.keys(T).length + '|' + P.idades.length + '|' +
       P.idades[P.idades.length - 1].homens + '|' + R.lista.length + '|' + R.lista[0].populacao;
     if (_cache.sig !== sig) {
-      _cache = { sig: sig, faixas: null, faixaBounds: null, listasIds: null, celulas: null, idxOfIdade: null, fIdxDeIdade: null, juntaRD: [] };
+      _cache = { sig: sig, faixas: null, faixaBounds: null, listasIds: null, celulas: null, idxOfIdade: null, fIdxDeIdade: null, juntaRD: {} };
     }
     celulas(); // barato; rebuild só quando a assinatura dos dados muda
 
     var s = normalizeState(state);
+    // modo de cálculo (seletor estrutural): 'independente' = produto das marginais, ignora correlações
+    var independente = s.modoCalculo === 'independente';
+    // base da renda (seletor estrutural): troca a tabela, não soma probabilidade
+    var rendaEscopo = s.rendaEscopo === 'perCapita' ? 'perCapita' : 'familiar';
+    var rendaTab = rendaEscopo === 'perCapita'
+      ? T.rendaPorIdade
+      : (T.rendaFamiliarPorIdade || T.rendaPorIdade);
     var gu = s.generoUsuario === 'F' ? 'F' : 'M';
     var gb = s.generoBuscado;
     var alvos = gb === 'ambos' ? ['M', 'F'] : [gb];
@@ -430,10 +453,22 @@
     var iLo = Math.min(iv[0], iv[1]), iHi = Math.max(iv[0], iv[1]);
 
     // --- demais filtros: dispatch genérico type→handler ---
-    var dyns = [], alturas = [], rendaDesc = null, eduDesc = null, civilDesc = null, filhosDesc = null;
+    var dyns = [], alturas = [], rendaDesc = null, eduDesc = null, civilDesc = null, filhosDesc = null, racaDesc = null;
     for (var ci = 0; ci < CFG.length; ci++) {
       var cfg = CFG[ci];
+      if (cfg.structural) continue; // seletor estrutural (ex.: istCenario): troca tabela, não soma probabilidade
       if (STRUCT_KEYS[cfg.id]) continue;
+      if (cfg.rateKey === 'racaPorRenda') { // multi sem probKey: descrição de raça, tratado à parte (não passa pelo handler)
+        var todasRacas = (cfg.options || []).map(function (o) { return o.value; });
+        var marcadasRacas = Array.isArray(s[cfg.id]) ? s[cfg.id].slice() : todasRacas.slice();
+        racaDesc = {
+          ids: marcadasRacas,
+          todas: todasRacas,
+          ativo: marcadasRacas.length < todasRacas.length,
+          zero: marcadasRacas.length === 0
+        };
+        continue;
+      }
       var th = TYPE_HANDLERS[cfg.type];
       if (!th) { warn('type sem handler: ' + cfg.id + ' (' + cfg.type + ')'); continue; }
       var d = th(cfg, s[cfg.id]);
@@ -453,20 +488,55 @@
         var ids = d.markedOpts.map(function (o) { return o.value; });
         if (cfg.rateKey === RENDA_EDU_KEYS.renda) { rendaDesc = { ids: ids, d: d }; continue; }
         if (cfg.rateKey === RENDA_EDU_KEYS.edu) { eduDesc = { ids: ids, d: d }; continue; }
-        if (cfg.rateKey === CIVIL_FILHOS_KEYS.civil) { civilDesc = { ids: ids, d: d }; continue; }
+        if (cfg.rateKey === CIVIL_FILHOS_KEYS.civil) {
+          if (independente) {
+            dyns.push({ f: function (dd) { return function (sexo, faixa) { return optsSum(dd, sexo, faixa); }; }(d) });
+            continue;
+          }
+          civilDesc = { ids: ids, d: d }; continue;
+        }
         dyns.push({ f: function (dd) { return function (sexo, faixa) { return optsSum(dd, sexo, faixa); }; }(d) });
         continue;
       }
       if (d.kind === 'tri') {
-        if (cfg.rateKey === CIVIL_FILHOS_KEYS.filhos) { filhosDesc = { value: d.value, basePk: d.basePk }; continue; }
+        if (!independente && cfg.rateKey === CIVIL_FILHOS_KEYS.filhos) { filhosDesc = { value: d.value, basePk: d.basePk }; continue; }
         var pk = d.opt.probKey;
+        if (cfg.rateKey === 'ist' && s.istCenario === 'c1') pk = pk.replace(/^ist\./, 'istC1.');
         dyns.push({ f: function (p) { return function (sexo, faixa) { var v = resolveOption(p, sexo, faixa); return v == null ? 1 : clamp(v, 0, 1); }; }(pk) });
         continue;
       }
     }
 
+    // --- renda selecionada (peso do fator de raça) ---
+    // no modo independente: pondera pela marginal etária de renda completa (raça sem correlação com a renda filtrada)
+    var incomeSel = [];
+    if (independente) {
+      for (var ir0 = 0; ir0 < T.rendaFaixas.length; ir0++) incomeSel.push(ir0);
+    } else if (rendaDesc && !rendaDesc.d.zero) {
+      for (var ir = 0; ir < T.rendaFaixas.length; ir++) {
+        if (rendaDesc.ids.indexOf(T.rendaFaixas[ir].id) >= 0) incomeSel.push(ir);
+      }
+    } else if (!rendaDesc) {
+      for (var ir2 = 0; ir2 < T.rendaFaixas.length; ir2++) incomeSel.push(ir2);
+    }
+
+    // --- renda selecionada na base escolhida (fator próprio: optsSum apontaria só a margem per capita) ---
+    var rendaSelIdx = [];
+    if (rendaDesc) {
+      if (rendaDesc.d.zero) rendaSelIdx = [];
+      else for (var ir3 = 0; ir3 < T.rendaFaixas.length; ir3++) {
+        if (rendaDesc.ids.indexOf(T.rendaFaixas[ir3].id) >= 0) rendaSelIdx.push(ir3);
+      }
+    }
+    function fatorRenda(sexo, faixa) {
+      var row = rendaTab[faixa]; if (!row) return 1;
+      var q = 0;
+      for (var k = 0; k < rendaSelIdx.length; k++) q += row[rendaSelIdx[k]] || 0;
+      return clamp(q, 0, 1);
+    }
+
     // --- junta renda × escolaridade (aplica UMA vez) ---
-    var juntaAtiva = !!(rendaDesc && eduDesc);
+    var juntaAtiva = !independente && !!(rendaDesc && eduDesc);
     var riT = null, eiT = null;
     if (juntaAtiva) {
       riT = []; eiT = [];
@@ -475,18 +545,46 @@
       for (rr = 0; rr < lstR.length; rr++) if (rendaDesc.ids.indexOf(lstR[rr].id) >= 0) riT.push(rr);
       for (ee = 0; ee < lstE.length; ee++) if (eduDesc.ids.indexOf(lstE[ee].id) >= 0) eiT.push(ee);
     } else {
-      if (rendaDesc) dyns.push({ f: function (dd) { return function (sexo, faixa) { return optsSum(dd, sexo, faixa); }; }(rendaDesc.d) });
+      if (rendaDesc) dyns.push({ f: fatorRenda });
       if (eduDesc) dyns.push({ f: function (dd) { return function (sexo, faixa) { return optsSum(dd, sexo, faixa); }; }(eduDesc.d) });
     }
 
-    var F2 = matrizFatores(dyns, civilDesc, filhosDesc, alturas);
+    // --- fator de raça: share da renda nas colunas marcadas de TAXAS.racaPorRenda,
+    // ponderada pelas faixas de renda selecionadas (incomeSel) na faixa etária ---
+    function fatorRaca(sexo, faixa) {
+      if (!racaDesc || !racaDesc.ativo) return 1;
+      if (racaDesc.zero) return 0;
+      var tab = T.racaPorRenda && (T.racaPorRenda[sexo] || T.racaPorRenda.M);
+      var inc = rendaTab && rendaTab[faixa];
+      if (!tab || !Array.isArray(inc) || !Array.isArray(T.racaFaixas)) return 1;
+      var cols = [];
+      for (var c = 0; c < T.racaFaixas.length; c++) {
+        if (racaDesc.ids.indexOf(T.racaFaixas[c].id) >= 0) cols.push(c);
+      }
+      var numAcc = 0, den = 0;
+      for (var k = 0; k < incomeSel.length; k++) {
+        var i = incomeSel[k];
+        var p = inc[i];
+        if (!num(p)) continue;
+        var row = tab[i] || [];
+        var q = 0;
+        for (var c2 = 0; c2 < cols.length; c2++) { var rv = row[cols[c2]]; if (num(rv)) q += rv; }
+        numAcc += p * q; den += p;
+      }
+      return den > 0 ? clamp(numAcc / den, 0, 1) : 0;
+    }
+    if (racaDesc && racaDesc.ativo) dyns.push({ f: fatorRaca });
+
+    var civilPass = independente ? null : civilDesc;
+    var filhosPass = independente ? null : filhosDesc;
+    var F2 = matrizFatores(dyns, civilPass, filhosPass, alturas);
 
     // cache do fator da junta por (ra,fIdx)
     var rdMemo = {};
     function factorRD(raIdx, fIdx) {
       var key = raIdx + '/' + fIdx, m = rdMemo[key];
       if (m != null) return m;
-      var junta = juntaRD(fIdx);
+      var junta = juntaRD(fIdx, rendaEscopo);
       if (!junta) { rdMemo[key] = 1; return 1; }
       var mat = junta[raIdx], q = 0, a, b;
       for (a = 0; a < riT.length; a++) for (b = 0; b < eiT.length; b++) q += mat[riT[a]][eiT[b]];

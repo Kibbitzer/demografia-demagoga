@@ -68,6 +68,18 @@
         </div>
       </section>
 
+      <section class="card funil-card" aria-labelledby="funil-title">
+        <div class="card-head">
+          <div>
+            <h3 id="funil-title" class="card-title">Funil de filtros</h3>
+            <p class="card-hint">Quanto a base encolhe a cada critério ativo. Barras proporcionais, não funil: largura de funil distorce a leitura (Graphtelling; Storytelling with Data).</p>
+          </div>
+        </div>
+        <div class="chart-wrap chart-wrap-funil">
+          <canvas id="chart-funil" role="img" aria-label="Funil de candidatos por filtro"></canvas>
+        </div>
+      </section>
+
       <!-- ===== Grid analítico ===== -->
       <section class="grid" aria-label="Análise detalhada">
         <article class="card" aria-labelledby="insights-title">
@@ -103,6 +115,8 @@
               <tfoot>
                 <tr>
                   <th scope="row">Total</th>
+                  <td id="table-ra-total-pop" class="num">—</td>
+                  <td class="num">100,0%</td>
                   <td id="table-ra-total" class="num">—</td>
                   <td id="table-ra-total-pct" class="num">—</td>
                 </tr>
@@ -185,6 +199,7 @@
   <script src="assets/js/data/filtros.js"></script>
   <script src="assets/js/engine.js"></script>
   <script src="assets/js/sensibilidade.js"></script>
+  <script src="assets/js/analytics.js"></script>
   <script src="assets/vendor/chart.umd.min.js"></script>
   <script src="assets/js/charts.js"></script>
   <script src="assets/js/ui.js"></script>

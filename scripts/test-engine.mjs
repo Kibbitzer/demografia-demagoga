@@ -148,6 +148,23 @@ ok(new Set(topAll.map(e => e.id)).size === 6, 'sensibilidade: ids únicos na lis
 const topNeut = win.Sensibilidade.top(NEUTRAL, 4);
 ok(Array.isArray(topNeut) && topNeut.length === 0, `sensibilidade: nenhum filtro ativo → lista vazia (${topNeut.length})`);
 
+// ---------- 8) modo de cálculo: correlacionado × independente ----------
+const RESTRITIVO = {
+  idade: [25, 35], altura: [165, 180],
+  renda: ['10a20', '20mais'],
+  relacionamento: ['solteiro', 'namorando'],
+  filhos: 'nao',
+  escolaridade: ['superior', 'pos'],
+  fumante: 'nao', antecedentes: 'nao', ist: 'nao', infidelidade: 'nao',
+  raca: ['branca', 'parda'],
+};
+const restrCorr = E.calcular({ ...RESTRITIVO, modoCalculo: 'correlacionado' }).total;
+const restrIndep = E.calcular({ ...RESTRITIVO, modoCalculo: 'independente' }).total;
+ok(restrCorr > 0, `modo correlacionado (restritivo): total > 0 (${restrCorr})`);
+ok(restrIndep > 0, `modo independente (restritivo): total > 0 (${restrIndep})`);
+ok(E.calcular({ ...NEUTRAL, modoCalculo: 'correlacionado' }).total > 0, 'modo correlacionado (neutro): total > 0');
+ok(E.calcular({ ...NEUTRAL, modoCalculo: 'independente' }).total > 0, 'modo independente (neutro): total > 0');
+
 report();
 
 function report() {

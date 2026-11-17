@@ -432,6 +432,12 @@ img, canvas { max-width: 100%; }
   margin-bottom: 14px;
 }
 
+/* Card full-width do funil de filtros */
+.funil-card {
+  width: 100%;
+  align-self: stretch;
+}
+
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 2fr);
@@ -488,6 +494,7 @@ img, canvas { max-width: 100%; }
   margin: 6px 0 14px;
 }
 .chart-wrap-sm { height: clamp(200px, 28vw, 260px); }
+.chart-wrap-funil { height: 300px; margin-bottom: 0; min-height: 220px; }
 .chart-wrap canvas { display: block; max-width: 100%; }
 
 /* ---------- Tabela ---------- */
@@ -896,6 +903,7 @@ body.modal-open { overflow: hidden; }
   .card { padding: 16px 14px; }
   .main { gap: 16px; }
   .grid { gap: 16px; }
+  .chart-wrap-funil { height: 340px; }
 }
 
 /* 360px: sem overflow horizontal */

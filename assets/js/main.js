@@ -59,6 +59,7 @@
     var ins = Sensibilidade.top(state, 4);
     UI.render(res, state, ins);
     Charts.renderRA(res.porRA);
+    if (state && window.Funil && Charts.renderFunil) Charts.renderFunil(Funil.calcular(state));
     if (state.aparencia.ativo) Charts.renderAparencia(state.aparencia.notaMinima);
   }
 

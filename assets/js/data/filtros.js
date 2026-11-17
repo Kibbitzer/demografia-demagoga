@@ -54,6 +54,22 @@
 
   window.FILTERS_CONFIG = [
     {
+      id: 'modoCalculo',
+      label: 'Modo de cálculo',
+      category: 'Demografia & Compatibilidade',
+      type: 'select',
+      structural: true,
+      options: [
+        { value: 'correlacionado', label: 'Correlacionado (matrizes)', probKey: null },
+        { value: 'independente', label: 'Independente (produto)', probKey: null }
+      ],
+      defaultValue: 'correlacionado',
+      source: 'Premissa metodológica do modelo',
+      methodologyNote: 'Correlacionado (padrão): matrizes idade×renda, idade×estado civil×filhos, RA×renda×escolaridade, renda×escolaridade e renda×raça. Independente: produto das marginais, como se as variáveis não covariassem. Não é teto: dependendo da seleção, pode inflar ou reduzir o total. A realidade está entre os dois.',
+      confianca: 'B',
+      ajuda: 'Compare os dois modos. Correlacionado é o mais realista; independente serve como contraste metodológico.'
+    },
+    {
       id: 'generoUsuario',
       label: 'Meu gênero',
       category: 'Demografia & Compatibilidade',
@@ -121,7 +137,7 @@
     },
     {
       id: 'altura',
-      label: 'Altura',
+      label: 'Altura do alvo (cm)',
       category: 'Físico & Estilo de Vida',
       type: 'range',
       min: 140,
@@ -129,23 +145,39 @@
       step: 1,
       rateKey: 'altura',
       source: 'IBGE — antropometria inquirida (aproximação normal)',
-      methodologyNote: 'Normal truncada por sexo (TAXAS.altura). Probabilidade = massa entre os dois limites.',
+      methodologyNote: 'Normal truncada por sexo (TAXAS.altura). Probabilidade = massa entre os dois limites. Refere-se ao alvo, não ao usuário.',
       defaultValue: [140, 210],
       confianca: 'B',
-      ajuda: 'Filtro físico; interage com generoBuscado para escolher mu/sd.'
+      ajuda: 'Altura da pessoa buscada, não a sua. 178–186 cm entre mulheres é ~0,4% (cauda alta).'
+    },
+    {
+      id: 'rendaEscopo',
+      label: 'Base da renda',
+      category: 'Socioeconômico',
+      type: 'select',
+      structural: true,
+      options: [
+        { value: 'familiar', label: 'Familiar total', probKey: null },
+        { value: 'perCapita', label: 'Per capita', probKey: null }
+      ],
+      defaultValue: 'familiar',
+      source: 'PDAD 2024 (IPEDF) / PNAD Contínua',
+      methodologyNote: 'Familiar total = soma da renda mensal de todos os moradores (inclui pais/cônjuge). Per capita = renda domiciliar dividida pelo número de moradores. O motor troca a tabela de probabilidades; não soma as duas.',
+      confianca: 'B',
+      ajuda: 'Use "Familiar total" se a renda vem da família; "Per capita" para comparação por pessoa.'
     },
     {
       id: 'renda',
-      label: 'Renda familiar',
+      label: 'Renda familiar (SM)',
       category: 'Socioeconômico',
       type: 'multi',
       options: TODAS_RENDA.map(function (id, idx) { return opcaoRenda(idx); }),
       rateKey: 'rendaPorIdade',
       source: 'PDAD Contínua 2024 / PNAD Contínua DF',
-      methodologyNote: 'Margem por faixa etária em TAXAS.rendaPorIdade; probKey usa índice da coluna (6 faixas). Independência entre renda e demais filtros é premissa do modelo.',
+      methodologyNote: 'Base escolhida em "Base da renda": familiar total usa TAXAS.rendaFamiliarPorIdade; per capita usa TAXAS.rendaPorIdade. O motor troca a tabela (probKey dos itens é a margem per capita). Independência entre renda e demais filtros é premissa do modelo.',
       defaultValue: TODAS_RENDA.slice(),
       confianca: 'B',
-      ajuda: 'Renda declarada em SM; as 6 faixas somam 1 dentro de cada idade.'
+      ajuda: 'Renda declarada em SM; as 6 faixas somam 1 dentro de cada idade. Troque a base em "Base da renda".'
     },
     {
       id: 'relacionamento',
@@ -207,6 +239,29 @@
       ajuda: 'Aplicada igual para todas as idades; limitação registrada no bloco TAXAS.'
     },
     {
+      id: 'raca',
+      label: 'Cor/raça',
+      category: 'Demografia & Compatibilidade',
+      type: 'multi',
+      // probKey null de propósito: sem caminho resolvido; o motor trata o rateKey
+      // 'racaPorRenda' de forma especial (P(raça | renda, sexo)). A chave existe só
+      // para satisfazer o contrato de formato de opções (test-dados.mjs).
+      options: [
+        { value: 'branca', label: 'Branca', probKey: null },
+        { value: 'parda', label: 'Parda', probKey: null },
+        { value: 'preta', label: 'Negra', probKey: null },
+        { value: 'amarela', label: 'Amarela', probKey: null },
+        { value: 'indigena', label: 'Indígena', probKey: null },
+        { value: 'outros', label: 'Outros', probKey: null }
+      ],
+      rateKey: 'racaPorRenda',
+      source: 'PDAD 2024 / Censo 2022 / PNAD Contínua',
+      methodologyNote: 'Autodeclaração. Probabilidade condicionada à renda e ao sexo: pretas/pardas concentram-se nas faixas baixas; brancas nas altas. Não é distribuição uniforme. Com renda ativa, o motor usa P(raça | renda selecionada); sem renda, usa a marginal ponderada pela distribuição etária de renda.',
+      defaultValue: ['branca', 'parda', 'preta', 'amarela', 'indigena', 'outros'],
+      confianca: 'B',
+      ajuda: 'Marcar tudo = indiferente. Excluir "Negra" derruba mais candidatos quando a renda está limitada às faixas baixas.'
+    },
+    {
       id: 'fumante',
       label: 'Fumante',
       category: 'Físico & Estilo de Vida',
@@ -246,17 +301,33 @@
       ajuda: 'Onde "antecedentes" = condenação transitada em julgado; inquéritos não entram.'
     },
     {
+      id: 'istCenario',
+      label: 'Cenário de IST',
+      category: 'Comportamental',
+      type: 'select',
+      structural: true,
+      options: [
+        { value: 'c2', label: 'C2 — qualquer IST', probKey: null },
+        { value: 'c1', label: 'C1 — só crônicas', probKey: null }
+      ],
+      defaultValue: 'c2',
+      source: 'Ministério da Saúde / SES-DF — POP-Brasil, ONDA e boletins epidemiológicos',
+      methodologyNote: 'C2 inclui HPV e herpes: prevalência alta (~38–52% por faixa etária, POP-Brasil). C1 restringe a IST crônicas/sistêmicas (HIV, hepatites B/C, sífilis ativa): ~2% (1,5–3%). O seletor troca a tabela usada pelo filtro IST; não soma probabilidades.',
+      confianca: 'B',
+      ajuda: 'C1 é o recorte do estudo consolidado; C2 é o mais amplo e inclui HPV/herpes.'
+    },
+    {
       id: 'ist',
-      label: 'IST',
+      label: 'IST diagnosticada',
       category: 'Comportamental',
       type: 'tri-state',
       options: opcoesTri('ist.porIdade:{faixa}.p', ['Sim', 'Não']),
       rateKey: 'ist',
       source: 'POP-Brasil / estimativas ONDA — Ministério da Saúde',
-      methodologyNote: 'Cenário C2 (qualquer IST). Cenário C1 (somente crônicas: HIV, hepatites B/C, sífilis ativa) ≈ 0,02 está documentado na nota de TAXAS.ist.',
+      methodologyNote: 'Cenário escolhido em Cenário de IST (C1/C2). C2 = qualquer IST (TAXAS.ist); C1 = só crônicas: HIV, hepatites B/C, sífilis ativa (TAXAS.istC1). O seletor troca a tabela; não soma probabilidades.',
       defaultValue: 'indiferente',
       confianca: 'B',
-      ajuda: 'HPV/genital é maioria dos casos; prevalência cai com a idade (menos atividade parceira nova).'
+      ajuda: 'Use o seletor "Cenário de IST" para alternar C1/C2.'
     },
     {
       id: 'infidelidade',
