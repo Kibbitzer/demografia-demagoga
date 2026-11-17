@@ -516,8 +516,10 @@
     var total = num(res.total) ? res.total : 0;
     setText($('#kpi-total'), fmtInt.format(Math.round(total)));
     setText($('#kpi-pct'), fmt2.format((total / BASE_DF) * 100) + '%');
-    var um = num(res.umEmCada) && res.umEmCada > 0 ? Math.round(res.umEmCada) : null;
-    setText($('#kpi-umemcada'), um != null ? fmtInt.format(um) : '—');
+    var hab = num(res.umEmCadaHabitantes) && res.umEmCadaHabitantes > 0 ? res.umEmCadaHabitantes : null;
+    setText($('#kpi-umemcada'), hab != null ? fmt1.format(hab) : '—');
+    var grupo = num(res.umEmCada) && res.umEmCada > 0 ? res.umEmCada : null;
+    setText($('#kpi-grupo'), grupo != null ? fmt1.format(grupo) : '—');
     setText($('#kpi-base'), num(res.base) ? fmtInt.format(Math.round(res.base)) : '—');
     setText($('#kpi-denom'), num(res.denominador) ? fmtInt.format(Math.round(res.denominador)) : '—');
     var zero = $('#aviso-zero');

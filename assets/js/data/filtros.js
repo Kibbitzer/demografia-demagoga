@@ -115,7 +115,7 @@
       step: 1,
       source: 'Censo 2022 — SIDRA 9514 (escala 2026)',
       methodologyNote: 'Contagem direta da pirâmide por idade (DATA_POPULACAO.idades), sem taxa envolvida.',
-      defaultValue: [25, 35],
+      defaultValue: [18, 80],
       confianca: 'A',
       ajuda: 'A pirâmide só existe de 18 a 100; abaixo de 18 o funil é nulo por definição do produto.'
     },
@@ -130,7 +130,7 @@
       rateKey: 'altura',
       source: 'IBGE — antropometria inquirida (aproximação normal)',
       methodologyNote: 'Normal truncada por sexo (TAXAS.altura). Probabilidade = massa entre os dois limites.',
-      defaultValue: [160, 180],
+      defaultValue: [140, 210],
       confianca: 'B',
       ajuda: 'Filtro físico; interage com generoBuscado para escolher mu/sd.'
     },

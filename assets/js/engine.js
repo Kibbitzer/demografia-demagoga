@@ -548,7 +548,8 @@
       porGenero: porGenero,
       base: baseAdulta,
       denominador: denom,
-      umEmCada: total > 0 ? denom / total : Infinity
+      umEmCada: total > 0 ? denom / total : Infinity,
+      umEmCadaHabitantes: total > 0 ? P.totalDF / total : Infinity
     };
   }
 

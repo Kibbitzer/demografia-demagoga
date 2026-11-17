@@ -434,9 +434,14 @@ img, canvas { max-width: 100%; }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 2fr);
   gap: 20px;
   align-items: start;
+}
+
+/* Abaixo de 1400px a tabela precisa de largura própria: empilha */
+@media (max-width: 1399.98px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ---------- Insights ---------- */
@@ -494,7 +499,7 @@ img, canvas { max-width: 100%; }
   border-radius: 10px;
 }
 
-.table { font-size: 0.88rem; min-width: 340px; }
+.table { font-size: 0.88rem; min-width: 560px; }
 
 .table th,
 .table td {
