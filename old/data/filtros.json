@@ -1,0 +1,215 @@
+{
+  "_meta": {
+    "modelo": "prevalencia da caracteristica; fator = 1 (ignorar) | p (exigir) | 1-p (excluir)",
+    "tolerancias": {
+      "divergencia_maxima_relatorio": 0.05,
+      "fonte": "§6.6 critério 2"
+    },
+    "cenarios": {
+      "c1": ["ist_cronica"],
+      "c2": ["qualquer_ist"]
+    }
+  },
+  "seletores": {
+    "sexo": ["mulheres", "homens", "ambos"],
+    "faixa_etaria_presets": ["18-24", "25-29", "25-34"],
+    "ra_dataset": "data/ra.json"
+  },
+  "filtros": [
+    {
+      "id": "nao_vive_em_uniao",
+      "rotulo": "Não vive em união",
+      "grupo": "Status",
+      "ordem": 1,
+      "fonte": "censo_2022_sidra_10185",
+      "confianca": "B",
+      "verificado": true,
+      "disponivel_homens": true,
+      "prevalencia": {
+        "mulheres": {"min": 0.505, "max": 0.505},
+        "homens": {"min": 0.592, "max": 0.592}
+      },
+      "nota": "Censo 2022, DF, 25–29 anos: 56.777 de 112.359 mulheres (0,5053); homens 64.966 de 109.648 (0,5925)."
+    },
+    {
+      "id": "sem_filhos",
+      "rotulo": "Sem filhos",
+      "grupo": "Status",
+      "ordem": 2,
+      "fonte": "censo_2022_sidra_10075",
+      "confianca": "B",
+      "verificado": true,
+      "disponivel_homens": false,
+      "prevalencia": {
+        "mulheres": {"min": 0.584, "max": 0.584},
+        "homens": null
+      },
+      "nota": "Censo 2022, DF, mulheres 25–29: 47.262 com filhos sobre 113.649 → 58,4% sem filhos; sem recorte masculino."
+    },
+    {
+      "id": "historico_infidelidade",
+      "rotulo": "Histórico de infidelidade",
+      "grupo": "Status",
+      "ordem": 3,
+      "fonte": "mosaico_2_0",
+      "confianca": "B",
+      "verificado": false,
+      "disponivel_homens": true,
+      "prevalencia": {
+        "mulheres": {"min": 0.302, "max": 0.302},
+        "homens": {"min": 0.505, "max": 0.505}
+      },
+      "nota": "Mosaico 2.0: valor único sem faixa; homens 50,5%."
+    },
+    {
+      "id": "namoro_sem_coabitacao",
+      "rotulo": "Namoro sem coabitação",
+      "grupo": "Status",
+      "ordem": 4,
+      "fonte": "premissa_namoro",
+      "confianca": "C",
+      "verificado": false,
+      "disponivel_homens": false,
+      "prevalencia": {
+        "mulheres": {"min": 0.30, "max": 0.40},
+        "homens": null
+      },
+      "nota": "Premissa interna, sem fonte; faixa 30%–40%; sem recorte masculino verificado."
+    },
+    {
+      "id": "superior_completo",
+      "rotulo": "Ensino superior completo",
+      "grupo": "Socioeconômico",
+      "ordem": 5,
+      "fonte": "censo_2022_sidra_10061",
+      "confianca": "A",
+      "verificado": true,
+      "disponivel_homens": true,
+      "prevalencia": {
+        "mulheres": {"min": 0.4172, "max": 0.4172},
+        "homens": {"min": 0.3104, "max": 0.3104}
+      },
+      "nota": "Censo 2022, DF, 25–29: 46.871 de 112.359 mulheres (0,4172); homens 34.039 de 109.648 (0,3104)."
+    },
+    {
+      "id": "fumante",
+      "rotulo": "Fumante",
+      "grupo": "Saúde",
+      "ordem": 6,
+      "fonte": "vigitel_2024_df",
+      "confianca": "A",
+      "verificado": false,
+      "disponivel_homens": false,
+      "prevalencia": {
+        "mulheres": {"min": 0.06, "max": 0.08},
+        "homens": null
+      },
+      "nota": "Vigitel DF: fumante corrente; taxa masculina a verificar."
+    },
+    {
+      "id": "alcool_abusivo",
+      "rotulo": "Consumo abusivo de álcool",
+      "grupo": "Saúde",
+      "ordem": 7,
+      "fonte": "vigitel_2024_df",
+      "confianca": "A",
+      "verificado": false,
+      "disponivel_homens": false,
+      "prevalencia": {
+        "mulheres": {"min": 0.14, "max": 0.17},
+        "homens": null
+      },
+      "nota": "Vigitel DF: consumo abusivo de álcool; taxa masculina a verificar."
+    },
+    {
+      "id": "obesidade",
+      "rotulo": "Obesidade (IMC ≥ 30)",
+      "grupo": "Saúde",
+      "ordem": 8,
+      "fonte": "vigitel_2024_df",
+      "confianca": "A",
+      "verificado": false,
+      "disponivel_homens": false,
+      "prevalencia": {
+        "mulheres": {"min": 0.10, "max": 0.14, "padrao": 0.12},
+        "homens": null
+      },
+      "nota": "Vigitel DF: IMC ≥ 30; padrão 0,12 dentro de 0,10–0,14."
+    },
+    {
+      "id": "atividade_fisica_minima",
+      "rotulo": "Atividade física mínima",
+      "grupo": "Saúde",
+      "ordem": 9,
+      "fonte": "vigitel_2024_df",
+      "confianca": "B",
+      "verificado": false,
+      "disponivel_homens": false,
+      "prevalencia": {
+        "mulheres": {"min": 0.40, "max": 0.45},
+        "homens": null
+      },
+      "nota": "Vigitel DF: atividade física no lazer suficiente; confiança B."
+    },
+    {
+      "id": "ist_cronica",
+      "rotulo": "IST crônicas (cenário C1)",
+      "grupo": "Saúde",
+      "ordem": 10,
+      "fonte": "pop_brasil_ms",
+      "confianca": "B",
+      "verificado": false,
+      "disponivel_homens": false,
+      "prevalencia": {
+        "mulheres": {"min": 0.02, "max": 0.02},
+        "homens": null
+      },
+      "nota": "POP-Brasil: HIV, hepatites B/C e sífilis ativa; cenário C1."
+    },
+    {
+      "id": "qualquer_ist",
+      "rotulo": "Qualquer IST, incl. HPV/herpes (cenário C2)",
+      "grupo": "Saúde",
+      "ordem": 11,
+      "fonte": "pop_brasil_ms",
+      "confianca": "B",
+      "verificado": false,
+      "disponivel_homens": false,
+      "prevalencia": {
+        "mulheres": {"min": 0.48, "max": 0.50},
+        "homens": null
+      },
+      "nota": "POP-Brasil: inclui HPV e herpes; cenário C2."
+    },
+    {
+      "id": "antecedentes_criminais",
+      "rotulo": "Antecedentes criminais",
+      "grupo": "Outros",
+      "ordem": 12,
+      "fonte": "infopen_fbsp",
+      "confianca": "C",
+      "verificado": false,
+      "disponivel_homens": false,
+      "prevalencia": {
+        "mulheres": {"min": 0.005, "max": 0.01},
+        "homens": null
+      },
+      "nota": "Proxy nacional Infopen/FBSP; confiança C."
+    },
+    {
+      "id": "orientacao_exclusiva",
+      "rotulo": "Orientação exclusivamente homossexual",
+      "grupo": "Outros",
+      "ordem": 13,
+      "fonte": "pns_2019",
+      "confianca": "B",
+      "verificado": false,
+      "disponivel_homens": false,
+      "prevalencia": {
+        "mulheres": {"min": 0.015, "max": 0.025},
+        "homens": null
+      },
+      "nota": "PNS 2019: autodeclaração; recorte DF/nacional a registrar."
+    }
+  ]
+}

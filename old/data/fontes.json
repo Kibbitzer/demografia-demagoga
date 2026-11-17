@@ -1,0 +1,136 @@
+{
+  "fontes": [
+    {
+      "id": "censo_2022_sidra_9514",
+      "publicador": "IBGE",
+      "titulo": "Censo Demográfico 2022: Resultados do Universo — População por Idade e Sexo",
+      "ano": 2022,
+      "tabela": 9514,
+      "url": "https://apisidra.ibge.gov.br/values/t/9514/n3/53/v/93/p/2022/c2/4,5/c287/all/c286/113635",
+      "url_direta": "https://apisidra.ibge.gov.br/values/t/9514/n3/53/v/93/p/2022/c2/4,5/c287/all/c286/113635",
+      "confianca": "A",
+      "nota_acesso": "URL SIDRA verificada (§6.7 item 1)"
+    },
+    {
+      "id": "censo_2022_sidra_10296",
+      "publicador": "IBGE",
+      "titulo": "Censo Demográfico 2022: Resultados do Universo — Rendimento",
+      "ano": 2022,
+      "tabela": 10296,
+      "url": "https://www.ibge.gov.br",
+      "url_direta": null,
+      "confianca": "B",
+      "nota_acesso": "URL direta a registrar na coleta (§6.7); mulheres DF, rendimento per capita, sem recorte de idade (§6.9)"
+    },
+    {
+      "id": "pdad_a_2024",
+      "publicador": "IPEDF",
+      "titulo": "Pesquisa Distrital por Amostra de Domicílios (PDAD-A)",
+      "ano": 2024,
+      "tabela": null,
+      "url": "https://www.ipedf.df.gov.br",
+      "url_direta": null,
+      "confianca": "B",
+      "nota_acesso": "URL direta a registrar na coleta (§6.7 item 3); confiança B para RA, A para escolaridade (§6.4)"
+    },
+    {
+      "id": "vigitel_2024_df",
+      "publicador": "Ministério da Saúde",
+      "titulo": "Vigitel Brasil: Vigilância de Fatores de Risco e Proteção para Doenças Crônicas por Inquérito Telefônico",
+      "ano": 2024,
+      "tabela": null,
+      "url": "https://www.gov.br/saude",
+      "url_direta": null,
+      "confianca": "A",
+      "nota_acesso": "URL direta a registrar na coleta (§6.7 item 2); IMC, tabagismo e álcool com confiança A; atividade física com confiança B; quando o recorte DF não for publicado, usar taxa nacional e marcar confiança B"
+    },
+    {
+      "id": "pns_2019",
+      "publicador": "IBGE",
+      "titulo": "Pesquisa Nacional de Saúde — Módulos de Orientação Sexual Autodeclarada e Antropometria",
+      "ano": 2019,
+      "tabela": null,
+      "url": "https://www.ibge.gov.br",
+      "url_direta": null,
+      "confianca": "B",
+      "nota_acesso": "URL direta a registrar na coleta (§6.7 item 4); registrar se o recorte é DF ou nacional"
+    },
+    {
+      "id": "mosaico_2_0",
+      "publicador": "ProSex / IPq-FMUSP",
+      "titulo": "Estudo Mosaico Brasil 2.0",
+      "ano": null,
+      "tabela": null,
+      "url": null,
+      "url_direta": null,
+      "confianca": "B",
+      "nota_acesso": "URL direta a registrar na coleta (§6.7); sem landing page do publicador no plano; registrar se o recorte é DF ou nacional (§6.7 item 4)"
+    },
+    {
+      "id": "pop_brasil_ms",
+      "publicador": "Ministério da Saúde / Hospital Moinhos de Vento",
+      "titulo": "Estudo Epidemiológico sobre a Prevalência Nacional de Infecção pelo HPV (POP-Brasil)",
+      "ano": null,
+      "tabela": null,
+      "url": "https://www.gov.br/saude",
+      "url_direta": null,
+      "confianca": "B",
+      "nota_acesso": "URL direta a registrar na coleta (§6.7 item 5); prevalências de IST por cenário C1/C2; ano a registrar na coleta"
+    },
+    {
+      "id": "infopen_fbsp",
+      "publicador": "SENAPPEN / MJSP; FBSP",
+      "titulo": "Levantamento Nacional de Informações Penitenciárias (Infopen / Infopen Mulheres); Anuário Brasileiro de Segurança Pública",
+      "ano": null,
+      "tabela": null,
+      "url": "https://www.gov.br",
+      "url_direta": null,
+      "confianca": "C",
+      "nota_acesso": "URL direta a registrar na coleta (§6.7); proxy nacional; ano a registrar na coleta"
+    },
+    {
+      "id": "premissa_namoro",
+      "publicador": "Premissa interna",
+      "titulo": "Namoro sem coabitação — descarte 30%–40%",
+      "ano": null,
+      "tabela": null,
+      "url": null,
+      "url_direta": null,
+      "confianca": "C",
+      "nota_acesso": "Sem fonte: premissa assumida no plano (§6.4); filtro desligado por padrão (§6.9); sinalizar na UI (confiança C, §6.4)"
+    },
+    {
+      "id": "censo_2022_sidra_10185",
+      "publicador": "IBGE",
+      "titulo": "Censo Demográfico 2022 — Nupcialidade: pessoas de 10 anos ou mais por estado conjugal, sexo e grupo de idade",
+      "ano": 2022,
+      "tabela": 10185,
+      "url": "https://apisidra.ibge.gov.br/values/t/10185/n3/53/v/140/p/2022/c464/12109/c2/4,5/c58/1145/c86/95251",
+      "url_direta": "https://apisidra.ibge.gov.br/values/t/10185/n3/53/v/140/p/2022/c464/12109/c2/4,5/c58/1145/c86/95251",
+      "confianca": "B",
+      "nota_acesso": "Amostra; DF, 25–29 anos, categoria 'Não viviam em união'. Mulheres 56.777 de 112.359 = 0,5053; homens 64.966 de 109.648 = 0,5925."
+    },
+    {
+      "id": "censo_2022_sidra_10075",
+      "publicador": "IBGE",
+      "titulo": "Censo Demográfico 2022 — Fecundidade: mulheres de 12 anos ou mais que tiveram filhos nascidos vivos, por número de filhos e grupo de idade",
+      "ano": 2022,
+      "tabela": 10075,
+      "url": "https://apisidra.ibge.gov.br/values/t/10075/n3/53/v/13314/p/2022/c12291/58895/c1568/120704/c12232/104545",
+      "url_direta": "https://apisidra.ibge.gov.br/values/t/10075/n3/53/v/13314/p/2022/c12291/58895/c1568/120704/c12232/104545",
+      "confianca": "B",
+      "nota_acesso": "Amostra; DF, mulheres 25–29: 47.262 tiveram filhos. Denominador Censo 2022 universo 113.649 → sem filhos = 0,5841."
+    },
+    {
+      "id": "censo_2022_sidra_10061",
+      "publicador": "IBGE",
+      "titulo": "Censo Demográfico 2022 — Pessoas de 18 anos ou mais por nível de instrução, grupos de idade e sexo",
+      "ano": 2022,
+      "tabela": 10061,
+      "url": "https://apisidra.ibge.gov.br/values/t/10061/n3/53/v/2667/p/2022/c1568/120704,99713/c58/1145/c2/4,5/c86/95251",
+      "url_direta": "https://apisidra.ibge.gov.br/values/t/10061/n3/53/v/2667/p/2022/c1568/120704,99713/c58/1145/c2/4,5/c86/95251",
+      "confianca": "A",
+      "nota_acesso": "DF, 25–29 anos: superior completo 46.871/112.359 mulheres = 0,4172; 34.039/109.648 homens = 0,3104."
+    }
+  ]
+}

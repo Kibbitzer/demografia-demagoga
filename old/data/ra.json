@@ -1,0 +1,23 @@
+{
+  "fonte": "pdad_a_2024",
+  "fonte_relatorio": "§4 do estudo",
+  "confianca": "B",
+  "ras": [
+    {"id": "plano_piloto", "nome": "Plano Piloto", "peso": 22.0},
+    {"id": "aguas_claras", "nome": "Águas Claras", "peso": 16.0},
+    {"id": "taguatinga", "nome": "Taguatinga", "peso": 9.0},
+    {"id": "guara", "nome": "Guará", "peso": 8.0},
+    {"id": "ceilandia", "nome": "Ceilândia", "peso": 7.0},
+    {"id": "sudoeste_octogonal", "nome": "Sudoeste / Octogonal", "peso": 5.0},
+    {"id": "vicente_pires", "nome": "Vicente Pires", "peso": 4.5},
+    {"id": "samambaia", "nome": "Samambaia", "peso": 4.5},
+    {"id": "lago_norte_lago_sul", "nome": "Lago Norte e Lago Sul", "peso": 4.0},
+    {"id": "sobradinho", "nome": "Sobradinho e Sobradinho II", "peso": 4.0},
+    {"id": "gama", "nome": "Gama", "peso": 3.5},
+    {"id": "jardim_botanico", "nome": "Jardim Botânico", "peso": 3.0},
+    {"id": "santa_maria_recanto_planaltina", "nome": "Santa Maria, Recanto das Emas e Planaltina", "peso": 4.5},
+    {"id": "demais_ras", "nome": "Demais RAs", "peso": 5.0}
+  ],
+  "total": {"peso": 100.0},
+  "nota": "pesos do relatório §4; valor por RA = peso × total do funil"
+}

@@ -1,0 +1,528 @@
+{
+  "fonte": "censo_2022_sidra_9514",
+  "url": "https://apisidra.ibge.gov.br/values/t/9514/n3/53/v/93/p/2022/c2/4,5/c287/all/c286/113635",
+  "ano": 2022,
+  "municipio": {
+    "codigo": "53",
+    "nome": "Distrito Federal"
+  },
+  "acessado_em": "2026-11-16",
+  "verificado": true,
+  "total": 2817381,
+  "total_calculado": 2817381,
+  "escala_2026": {
+    "populacao_2026": 3009996,
+    "fator": 1.068367
+  },
+  "idades": [
+    {
+      "idade": 0,
+      "homens": 15520,
+      "mulheres": 15085
+    },
+    {
+      "idade": 1,
+      "homens": 15289,
+      "mulheres": 14699
+    },
+    {
+      "idade": 2,
+      "homens": 17030,
+      "mulheres": 16569
+    },
+    {
+      "idade": 3,
+      "homens": 18245,
+      "mulheres": 17697
+    },
+    {
+      "idade": 4,
+      "homens": 18522,
+      "mulheres": 18192
+    },
+    {
+      "idade": 5,
+      "homens": 18101,
+      "mulheres": 17398
+    },
+    {
+      "idade": 6,
+      "homens": 19060,
+      "mulheres": 18445
+    },
+    {
+      "idade": 7,
+      "homens": 19366,
+      "mulheres": 18602
+    },
+    {
+      "idade": 8,
+      "homens": 18855,
+      "mulheres": 17820
+    },
+    {
+      "idade": 9,
+      "homens": 18777,
+      "mulheres": 18187
+    },
+    {
+      "idade": 10,
+      "homens": 18191,
+      "mulheres": 17449
+    },
+    {
+      "idade": 11,
+      "homens": 18350,
+      "mulheres": 17712
+    },
+    {
+      "idade": 12,
+      "homens": 19089,
+      "mulheres": 18267
+    },
+    {
+      "idade": 13,
+      "homens": 18573,
+      "mulheres": 18112
+    },
+    {
+      "idade": 14,
+      "homens": 18802,
+      "mulheres": 18229
+    },
+    {
+      "idade": 15,
+      "homens": 20029,
+      "mulheres": 19731
+    },
+    {
+      "idade": 16,
+      "homens": 20744,
+      "mulheres": 20329
+    },
+    {
+      "idade": 17,
+      "homens": 21119,
+      "mulheres": 20390
+    },
+    {
+      "idade": 18,
+      "homens": 21952,
+      "mulheres": 21507
+    },
+    {
+      "idade": 19,
+      "homens": 21603,
+      "mulheres": 21142
+    },
+    {
+      "idade": 20,
+      "homens": 22680,
+      "mulheres": 21553
+    },
+    {
+      "idade": 21,
+      "homens": 22155,
+      "mulheres": 21909
+    },
+    {
+      "idade": 22,
+      "homens": 24452,
+      "mulheres": 23971
+    },
+    {
+      "idade": 23,
+      "homens": 23273,
+      "mulheres": 22387
+    },
+    {
+      "idade": 24,
+      "homens": 22883,
+      "mulheres": 22703
+    },
+    {
+      "idade": 25,
+      "homens": 23022,
+      "mulheres": 23184
+    },
+    {
+      "idade": 26,
+      "homens": 22361,
+      "mulheres": 22875
+    },
+    {
+      "idade": 27,
+      "homens": 22279,
+      "mulheres": 23120
+    },
+    {
+      "idade": 28,
+      "homens": 22102,
+      "mulheres": 22775
+    },
+    {
+      "idade": 29,
+      "homens": 20749,
+      "mulheres": 21695
+    },
+    {
+      "idade": 30,
+      "homens": 22858,
+      "mulheres": 23955
+    },
+    {
+      "idade": 31,
+      "homens": 20223,
+      "mulheres": 21752
+    },
+    {
+      "idade": 32,
+      "homens": 21929,
+      "mulheres": 23456
+    },
+    {
+      "idade": 33,
+      "homens": 21423,
+      "mulheres": 22994
+    },
+    {
+      "idade": 34,
+      "homens": 21494,
+      "mulheres": 23090
+    },
+    {
+      "idade": 35,
+      "homens": 22627,
+      "mulheres": 25472
+    },
+    {
+      "idade": 36,
+      "homens": 22410,
+      "mulheres": 25171
+    },
+    {
+      "idade": 37,
+      "homens": 21831,
+      "mulheres": 24564
+    },
+    {
+      "idade": 38,
+      "homens": 22317,
+      "mulheres": 25709
+    },
+    {
+      "idade": 39,
+      "homens": 22899,
+      "mulheres": 26309
+    },
+    {
+      "idade": 40,
+      "homens": 26535,
+      "mulheres": 30183
+    },
+    {
+      "idade": 41,
+      "homens": 23240,
+      "mulheres": 26702
+    },
+    {
+      "idade": 42,
+      "homens": 24635,
+      "mulheres": 28330
+    },
+    {
+      "idade": 43,
+      "homens": 22294,
+      "mulheres": 25883
+    },
+    {
+      "idade": 44,
+      "homens": 20887,
+      "mulheres": 24670
+    },
+    {
+      "idade": 45,
+      "homens": 21559,
+      "mulheres": 25021
+    },
+    {
+      "idade": 46,
+      "homens": 19904,
+      "mulheres": 23182
+    },
+    {
+      "idade": 47,
+      "homens": 19704,
+      "mulheres": 22553
+    },
+    {
+      "idade": 48,
+      "homens": 18353,
+      "mulheres": 21457
+    },
+    {
+      "idade": 49,
+      "homens": 17618,
+      "mulheres": 20719
+    },
+    {
+      "idade": 50,
+      "homens": 19108,
+      "mulheres": 21381
+    },
+    {
+      "idade": 51,
+      "homens": 16739,
+      "mulheres": 19235
+    },
+    {
+      "idade": 52,
+      "homens": 17055,
+      "mulheres": 19847
+    },
+    {
+      "idade": 53,
+      "homens": 15677,
+      "mulheres": 18219
+    },
+    {
+      "idade": 54,
+      "homens": 14871,
+      "mulheres": 17504
+    },
+    {
+      "idade": 55,
+      "homens": 15012,
+      "mulheres": 17576
+    },
+    {
+      "idade": 56,
+      "homens": 14307,
+      "mulheres": 17269
+    },
+    {
+      "idade": 57,
+      "homens": 13827,
+      "mulheres": 16598
+    },
+    {
+      "idade": 58,
+      "homens": 13287,
+      "mulheres": 16624
+    },
+    {
+      "idade": 59,
+      "homens": 12263,
+      "mulheres": 15073
+    },
+    {
+      "idade": 60,
+      "homens": 12185,
+      "mulheres": 15203
+    },
+    {
+      "idade": 61,
+      "homens": 10257,
+      "mulheres": 12952
+    },
+    {
+      "idade": 62,
+      "homens": 10447,
+      "mulheres": 13361
+    },
+    {
+      "idade": 63,
+      "homens": 9048,
+      "mulheres": 12035
+    },
+    {
+      "idade": 64,
+      "homens": 9035,
+      "mulheres": 11991
+    },
+    {
+      "idade": 65,
+      "homens": 8866,
+      "mulheres": 11921
+    },
+    {
+      "idade": 66,
+      "homens": 8046,
+      "mulheres": 10685
+    },
+    {
+      "idade": 67,
+      "homens": 7483,
+      "mulheres": 10240
+    },
+    {
+      "idade": 68,
+      "homens": 7349,
+      "mulheres": 9941
+    },
+    {
+      "idade": 69,
+      "homens": 6479,
+      "mulheres": 8939
+    },
+    {
+      "idade": 70,
+      "homens": 6752,
+      "mulheres": 9276
+    },
+    {
+      "idade": 71,
+      "homens": 5608,
+      "mulheres": 7797
+    },
+    {
+      "idade": 72,
+      "homens": 5654,
+      "mulheres": 8136
+    },
+    {
+      "idade": 73,
+      "homens": 4869,
+      "mulheres": 6880
+    },
+    {
+      "idade": 74,
+      "homens": 4610,
+      "mulheres": 6606
+    },
+    {
+      "idade": 75,
+      "homens": 4274,
+      "mulheres": 6072
+    },
+    {
+      "idade": 76,
+      "homens": 3685,
+      "mulheres": 5483
+    },
+    {
+      "idade": 77,
+      "homens": 3212,
+      "mulheres": 4875
+    },
+    {
+      "idade": 78,
+      "homens": 3155,
+      "mulheres": 4856
+    },
+    {
+      "idade": 79,
+      "homens": 2654,
+      "mulheres": 4130
+    },
+    {
+      "idade": 80,
+      "homens": 2748,
+      "mulheres": 3982
+    },
+    {
+      "idade": 81,
+      "homens": 2292,
+      "mulheres": 3168
+    },
+    {
+      "idade": 82,
+      "homens": 2395,
+      "mulheres": 3671
+    },
+    {
+      "idade": 83,
+      "homens": 1932,
+      "mulheres": 2934
+    },
+    {
+      "idade": 84,
+      "homens": 1723,
+      "mulheres": 2656
+    },
+    {
+      "idade": 85,
+      "homens": 1432,
+      "mulheres": 2291
+    },
+    {
+      "idade": 86,
+      "homens": 1390,
+      "mulheres": 2300
+    },
+    {
+      "idade": 87,
+      "homens": 1079,
+      "mulheres": 1783
+    },
+    {
+      "idade": 88,
+      "homens": 814,
+      "mulheres": 1422
+    },
+    {
+      "idade": 89,
+      "homens": 700,
+      "mulheres": 1190
+    },
+    {
+      "idade": 90,
+      "homens": 646,
+      "mulheres": 1262
+    },
+    {
+      "idade": 91,
+      "homens": 409,
+      "mulheres": 934
+    },
+    {
+      "idade": 92,
+      "homens": 410,
+      "mulheres": 801
+    },
+    {
+      "idade": 93,
+      "homens": 296,
+      "mulheres": 636
+    },
+    {
+      "idade": 94,
+      "homens": 238,
+      "mulheres": 489
+    },
+    {
+      "idade": 95,
+      "homens": 161,
+      "mulheres": 414
+    },
+    {
+      "idade": 96,
+      "homens": 121,
+      "mulheres": 343
+    },
+    {
+      "idade": 97,
+      "homens": 82,
+      "mulheres": 226
+    },
+    {
+      "idade": 98,
+      "homens": 75,
+      "mulheres": 149
+    },
+    {
+      "idade": 99,
+      "homens": 39,
+      "mulheres": 110
+    },
+    {
+      "idade": 100,
+      "homens": 77,
+      "mulheres": 223
+    }
+  ],
+  "agregados": {
+    "mulheres_25_29": 113649,
+    "homens_25_29": 110513
+  }
+}

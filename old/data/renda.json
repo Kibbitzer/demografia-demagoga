@@ -1,0 +1,23 @@
+{
+  "fonte": "censo_2022_sidra_10296",
+  "tabela": 10296,
+  "ano": 2022,
+  "recorte": "mulheres DF, rendimento per capita",
+  "confianca": "B",
+  "classes": [
+    {"id": "classe_1", "rotulo": "Até 1/4 de salário mínimo", "percentual": 5.18},
+    {"id": "classe_2", "rotulo": "Mais de 1/4 a 1/2 salário mínimo", "percentual": 12.68},
+    {"id": "classe_3", "rotulo": "Mais de 1/2 a 1 salário mínimo", "percentual": 23.24},
+    {"id": "classe_4", "rotulo": "Mais de 1 a 2 salários mínimos", "percentual": 21.87},
+    {"id": "classe_5", "rotulo": "Mais de 2 a 3 salários mínimos", "percentual": 10.35},
+    {"id": "classe_6", "rotulo": "Mais de 3 a 5 salários mínimos", "percentual": 11.12},
+    {"id": "classe_7", "rotulo": "Mais de 5 a 10 salários mínimos", "percentual": 9.20},
+    {"id": "classe_8", "rotulo": "Mais de 10 a 15 salários mínimos", "percentual": 2.24},
+    {"id": "classe_9", "rotulo": "Mais de 15 a 20 salários mínimos", "percentual": 0.68},
+    {"id": "classe_10", "rotulo": "Mais de 20 salários mínimos", "percentual": 0.46},
+    {"id": "classe_11", "rotulo": "Sem rendimento", "percentual": 2.96}
+  ],
+  "soma_percentual": 99.98,
+  "nota": "soma 99,98% por arredondamento da fonte; não renormalizar. Limites das classes e rótulos não transcritos no §6.9 — preencher na coleta.",
+  "limites": null
+}

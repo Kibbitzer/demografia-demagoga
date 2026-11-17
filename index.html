@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Demográfica de Parceiros em Potencial — DF</title>
+  <meta name="description" content="Estimativa do número de parceiros em potencial no Distrito Federal a partir de filtros demográficos. Dados IBGE, estimativa 2026.">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Ir para o conteúdo</a>
+
+  <!-- ===== Sidebar de filtros (drawer no mobile) ===== -->
+  <aside id="sidebar" class="sidebar" aria-label="Filtros">
+    <div class="sidebar-head">
+      <h2 class="sidebar-title">Filtros</h2>
+      <button id="btn-close-sidebar" type="button" class="icon-btn" aria-label="Fechar painel de filtros">
+        <span aria-hidden="true">✕</span>
+      </button>
+    </div>
+    <!-- Conteúdo 100% renderizado por ui.js a partir de FILTERS_CONFIG. Nenhum id de filtro hardcoded aqui. -->
+    <div id="filters-list" class="filters-list"></div>
+  </aside>
+  <div id="sidebar-overlay" class="sidebar-overlay" hidden></div>
+
+  <div class="shell">
+    <!-- ===== Header ===== -->
+    <header class="topbar">
+      <div class="topbar-titles">
+        <h1 class="topbar-title">Calculadora Demográfica de Parceiros em Potencial</h1>
+        <p class="topbar-subtitle">Distrito Federal · estimativa 2026</p>
+      </div>
+      <div class="topbar-actions">
+        <button id="btn-filtros" type="button" class="btn btn-secondary btn-drawer" aria-controls="sidebar" aria-expanded="false">
+          Filtros
+        </button>
+        <div class="preset-group" role="group" aria-label="Presets de perfil">
+          <button id="btn-preset-padrao" type="button" class="btn btn-preset" data-preset="padrao">Padrão Médio DF</button>
+          <button id="btn-preset-super" type="button" class="btn btn-preset" data-preset="super">Super Seletivo</button>
+          <button id="btn-preset-livre" type="button" class="btn btn-preset" data-preset="livre">Sem Restrições</button>
+        </div>
+        <button id="btn-metodologia" type="button" class="btn btn-secondary">Metodologia e Fontes</button>
+        <button id="btn-reset" type="button" class="btn btn-ghost">Resetar</button>
+      </div>
+    </header>
+
+    <main id="main" class="main">
+      <!-- ===== Hero KPI ===== -->
+      <section class="hero" aria-label="Resultado estimado">
+        <p class="hero-kicker">Resultado estimado</p>
+        <div class="hero-kpi" aria-live="polite">
+          <span id="kpi-total" class="kpi-total">—</span>
+          <div class="hero-badges">
+            <span class="kpi-badge"><strong id="kpi-pct">—</strong> do grupo de interesse</span>
+            <span class="kpi-badge">1 pessoa a cada <strong id="kpi-umemcada">—</strong> habitantes</span>
+          </div>
+        </div>
+        <div class="hero-sub">
+          <span class="hero-sub-item">População base (DF 2026): <strong id="kpi-base">—</strong></span>
+          <span class="hero-sub-sep" aria-hidden="true">·</span>
+          <span class="hero-sub-item">Denominador após filtros: <strong id="kpi-denom">—</strong></span>
+        </div>
+        <div id="aviso-zero" class="aviso-zero" hidden>
+          <strong>Nenhum resultado com esses filtros.</strong>
+          Relaxa um pouco a seletividade — a matemática agradece, e o mercado também.
+        </div>
+      </section>
+
+      <!-- ===== Grid analítico ===== -->
+      <section class="grid" aria-label="Análise detalhada">
+        <article class="card" aria-labelledby="insights-title">
+          <h3 id="insights-title" class="card-title">Filtros de maior impacto</h3>
+          <p class="card-hint">Quanto cada filtro reduz a base de candidatos.</p>
+          <ul id="insights-list" class="insights"></ul>
+        </article>
+
+        <article class="card" aria-labelledby="ra-title">
+          <div class="card-head">
+            <div>
+              <h3 id="ra-title" class="card-title">Candidatos por Região Administrativa</h3>
+              <p class="card-hint">Distribuição estimada no DF.</p>
+            </div>
+            <div class="search-wrap">
+              <label class="sr-only" for="search-ra">Buscar região administrativa</label>
+              <input id="search-ra" class="search-input" type="search" placeholder="Buscar região…" autocomplete="off">
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart-ra" role="img" aria-label="Gráfico de candidatos por Região Administrativa"></canvas>
+          </div>
+          <div class="table-wrap">
+            <table id="table-ra" class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Região Administrativa</th>
+                  <th scope="col" class="num">Candidatos</th>
+                  <th scope="col" class="num">%</th>
+                </tr>
+              </thead>
+              <tbody id="table-ra-body"></tbody>
+              <tfoot>
+                <tr>
+                  <th scope="row">Total</th>
+                  <td id="table-ra-total" class="num">—</td>
+                  <td id="table-ra-total-pct" class="num">—</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===== Card lúdico: aparência ===== -->
+      <section class="card card-ludico" aria-labelledby="ludico-title">
+        <div class="switch-row">
+          <div class="switch-row-text">
+            <h3 id="ludico-title" class="card-title">
+              Modificador de aparência
+              <span class="chip chip-fun">experimental</span>
+            </h3>
+            <p class="card-hint">Ative para aplicar uma nota de atratividade e ver o efeito (pouco) científico sobre o resultado.</p>
+          </div>
+          <button id="switch-aparencia" type="button" class="switch" role="switch" aria-checked="false" aria-controls="card-aparencia">
+            <span class="switch-thumb" aria-hidden="true"></span>
+            <span class="sr-only">Mostrar modificador de aparência</span>
+          </button>
+        </div>
+
+        <div id="card-aparencia" class="aparencia-panel" hidden>
+          <div class="aparencia-controls">
+            <div class="field-head">
+              <label for="input-nota">Nota de atratividade desejada</label>
+              <output id="nota-label" for="input-nota">5</output>
+            </div>
+            <input id="input-nota" class="range" type="range" min="1" max="10" step="0.5" value="5">
+            <p class="aparencia-fator">Fator multiplicativo aplicado: <strong id="aparencia-fator">—</strong></p>
+          </div>
+          <div class="chart-wrap chart-wrap-sm">
+            <canvas id="chart-aparencia" role="img" aria-label="Gráfico da distribuição de notas de aparência"></canvas>
+          </div>
+          <p class="aviso-subjetivo">
+            ⚠️ <strong>Aviso:</strong> aparência é um atributo subjetivo, cultural e não medido pelo IBGE.
+            Os números deste painel são uma brincadeira com distribuição estatística por cima. Não leve a mal — nem a sério.
+          </p>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>Estimativas construídas a partir de dados públicos (IBGE — Censo 2022 e Projeções da População). Combinar muitos filtros multiplica pequenas proporções: resultados pequenos são matemática, não destino.</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ===== Modal metodologia ===== -->
+  <div id="modal-metodologia" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-metodologia-title" hidden>
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <h2 id="modal-metodologia-title">Metodologia e Fontes</h2>
+        <button id="modal-close" type="button" class="icon-btn" aria-label="Fechar janela de metodologia">
+          <span aria-hidden="true">✕</span>
+        </button>
+      </div>
+      <div id="metodologia-body" class="modal-body">
+        <h3>Como a estimativa é calculada</h3>
+        <p>Partimos da população estimada do Distrito Federal para 2026 e aplicamos, em sequência, as proporções de cada filtro escolhido (idade, renda, escolaridade, região administrativa etc.). Como cada proporção é condicionada apenas a uma variável, o resultado assume independência aproximada entre filtros — uma simplificação deliberada.</p>
+        <h3>Fontes</h3>
+        <ul>
+          <li>IBGE — Censo Demográfico 2022 (estrutura etária, escolaridade, renda, distribuição por RA).</li>
+          <li>IBGE — Projeções da População (estimativa de referência para 2026).</li>
+          <li>IBGE — PNAD Contínua (renda e mercado de trabalho, quando aplicável).</li>
+        </ul>
+        <h3>Limitações</h3>
+        <p>Números são ordens de grandeza, não contagens. Cruzamentos reais entre variáveis podem produzir resultados maiores ou menores. E “parceiro em potencial” continua sendo uma categoria estatística que nenhuma pesquisa oficial mediu — até agora.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Scripts (ordem obrigatória) ===== -->
+  <script src="assets/js/data/populacao.js"></script>
+  <script src="assets/js/data/ras.js"></script>
+  <script src="assets/js/data/taxas.js"></script>
+  <script src="assets/js/data/filtros.js"></script>
+  <script src="assets/js/engine.js"></script>
+  <script src="assets/js/sensibilidade.js"></script>
+  <script src="assets/vendor/chart.umd.min.js"></script>
+  <script src="assets/js/charts.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

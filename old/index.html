@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Infimo nihil superest</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<h1 class="titulo" aria-label="Infimo nihil superest">
+<span class="titulo-a" aria-hidden="true">Infimo nihil superest</span>
+<span class="titulo-b" aria-hidden="true">Sobra nada para o betinha</span>
+</h1>
+<p class="subtitulo">Afunilamento demográfico no Distrito Federal, 2026. Fontes: Censo 2022, PDAD-A 2024, Vigitel, PNS, POP-Brasil, Mosaico 2.0.</p>
+
+<p class="resultado"><strong id="contador">—</strong> <span id="faixa"></span></p>
+<p id="percentual"></p>
+<p id="base-info"></p>
+<p id="aviso"></p>
+<button type="button" id="botao-preset">Restaurar preset do relatório</button>
+
+<section>
+<h2>População</h2>
+<fieldset>
+<legend>Sexo</legend>
+<label for="sexo-mulheres">Mulheres</label>
+<input type="radio" name="sexo" id="sexo-mulheres" value="mulheres" checked>
+<label for="sexo-homens">Homens</label>
+<input type="radio" name="sexo" id="sexo-homens" value="homens">
+<label for="sexo-ambos">Ambos</label>
+<input type="radio" name="sexo" id="sexo-ambos" value="ambos">
+</fieldset>
+<label for="idade-min">Idade mínima</label>
+<input type="range" id="idade-min" min="18" max="100" step="1" value="25">
+<label for="idade-max">Idade máxima</label>
+<input type="range" id="idade-max" min="18" max="100" step="1" value="29">
+<span id="idade-info"></span>
+<button type="button" data-idade="18-24">18–24 anos</button>
+<button type="button" data-idade="25-29">25–29 anos</button>
+<button type="button" data-idade="25-34">25–34 anos</button>
+</section>
+
+<section>
+<h2>Faixa de renda</h2>
+<label for="renda-piso">Piso (R$)</label>
+<input type="number" id="renda-piso" min="0" step="100" value="0" inputmode="numeric">
+<label for="renda-teto">Teto (R$)</label>
+<input type="number" id="renda-teto" min="0" step="100" placeholder="sem teto" inputmode="numeric">
+<label for="renda-sem-teto"><input type="checkbox" id="renda-sem-teto" checked> Sem teto</label>
+<p class="filtro-taxa">Renda domiciliar per capita, valores de julho de 2021 (PDAD 2021).</p>
+</section>
+
+<section>
+<h2>Regiões administrativas</h2>
+<div id="ras"></div>
+</section>
+
+<section>
+<h2>Filtros</h2>
+<div id="filtros"></div>
+</section>
+
+<section>
+<h2>Gráficos</h2>
+<p id="delta"></p>
+<svg id="grafico-etapas" width="720" height="320" role="img" aria-label="População restante após cada etapa"></svg>
+<svg id="grafico-impacto" width="720" height="320" role="img" aria-label="Removidos por filtro"></svg>
+</section>
+
+<section>
+<h2>Fontes</h2>
+<dl id="fontes"></dl>
+</section>
+
+<p class="rodape">Números aproximados; cada taxa traz a fonte e o grau de confiança. Base censitária difere ~3% da usada no relatório em Markdown.</p>
+<script type="module" src="assets/app.js"></script>
+</body>
+</html>
