@@ -5,7 +5,7 @@
  * Entrada de top(): { id, label, delta, deltaAbs, deltaRel, texto } — delta = totalSemFiltro − totalBase,
  * ordenado por deltaAbs desc, cortado em n. Nenhum filtro ativo → lista vazia (a mensagem fica no UI).
  * global(state): índices de sensibilidade por Monte Carlo sobre os filtros ativos ligados/desligados
- * (p=0,5, N=512, PRNG mulberry32 seed 20261118). Saída [{id,label,S,S_T,rank}] ordenada por S_T desc,
+ * (p=0,5, N=256, PRNG mulberry32 seed 20261118). Saída [{id,label,S,S_T,rank}] ordenada por S_T desc,
  * vazia sem filtro ativo.
  */
 (function () {
@@ -17,7 +17,7 @@
   var ESTRUTURAIS = { generoUsuario: 1, generoBuscado: 1, orientacaoAlvo: 1, idade: 1 };
 
   var SEED = 20261118; // mesma semente de incerteza.js ⇒ resultados reprodutíveis
-  var N_GLOBAL = 512;
+  var N_GLOBAL = 256; // custo reduzido; potência de 2, seed mantida
 
   function num(x) { return typeof x === 'number' && isFinite(x); }
 

@@ -13,6 +13,7 @@
   var state = null;
   var timerRecompute = null;
   var timerResize = null;
+  var tokenAnalises = 0;
 
   /* ---------- helpers de config ---------- */
 
@@ -62,6 +63,16 @@
       try { inc = Incerteza.resumo(state, 600); } catch (e) { inc = null; }
     }
     UI.render(res, state, ins, inc);
+    var estadoAtual = state;
+    var meu = ++tokenAnalises;
+    setTimeout(function () {
+      if (meu !== tokenAnalises) return;
+      try {
+        var atrib = window.Funil && Funil.atribuicao ? Funil.atribuicao(estadoAtual) : null;
+        var sens = window.Sensibilidade && Sensibilidade.global ? Sensibilidade.global(estadoAtual) : null;
+        UI.renderAnalises(atrib, sens);
+      } catch (e) { /* mantém painéis anteriores */ }
+    }, 0);
     Charts.renderRA(res.porRA);
     if (state && window.Funil && Charts.renderFunil) Charts.renderFunil(Funil.calcular(state));
     if (state.aparencia.ativo) Charts.renderAparencia(state.aparencia.notaMinima);

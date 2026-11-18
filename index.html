@@ -74,12 +74,13 @@
         <div class="card-head">
           <div>
             <h3 id="funil-title" class="card-title">Funil de filtros</h3>
-            <p class="card-hint">Quanto a base encolhe a cada critério ativo. Barras proporcionais, não funil: largura de funil distorce a leitura (Graphtelling; Storytelling with Data).</p>
+            <p class="card-hint">Quanto a base encolhe a cada critério ativo. Barras proporcionais, não funil: largura de funil distorce a leitura (Graphtelling; Storytelling with Data). Abaixo, atribuição Shapley (ordem não afeta os valores).</p>
           </div>
         </div>
         <div class="chart-wrap chart-wrap-funil">
           <canvas id="chart-funil" role="img" aria-label="Funil de candidatos por filtro"></canvas>
         </div>
+        <div id="funil-atribuicao" class="atribuicao" aria-live="polite"></div>
       </section>
 
       <!-- ===== Grid analítico ===== -->

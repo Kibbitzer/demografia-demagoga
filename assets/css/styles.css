@@ -500,6 +500,12 @@ img, canvas { max-width: 100%; }
 .chart-wrap-funil { height: 300px; margin-bottom: 0; min-height: 220px; }
 .chart-wrap canvas { display: block; max-width: 100%; }
 
+/* ---------- Atribuição Shapley (funil) ---------- */
+.atribuicao { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.atribuicao-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 0.82rem; }
+.atribuicao-row .bar { grid-column: 1 / -1; height: 5px; background: var(--border); border-radius: 999px; overflow: hidden; }
+.atribuicao-row .bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--indigo), var(--emerald)); }
+
 /* ---------- Tabela ---------- */
 .table-wrap {
   overflow-x: auto;

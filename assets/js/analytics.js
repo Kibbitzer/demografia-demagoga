@@ -142,11 +142,11 @@
   }
 
   // ---------- atribuição por Shapley (PLAN §13.3) ----------
-  // Perda marginal de cada filtro ativo, média sobre N_PERM permutações (Fisher–Yates,
-  // mulberry32 seed 20261118). A soma telescópica por permutação vale sempre
+  // Perda marginal de cada filtro ativo, média sobre N_PERM permutações (40, custo reduzido;
+  // Fisher–Yates, mulberry32 seed 20261118). A soma telescópica por permutação vale sempre
   // totalNeutro − totalFinal ⇒ eficiência exata: soma das médias = totalNeutro − totalFinal.
   var SEED = 20261118;
-  var N_PERM = 100;
+  var N_PERM = 40;
 
   function mulberry32(seed) {
     var a = seed >>> 0;

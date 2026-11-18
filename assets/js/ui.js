@@ -3,7 +3,7 @@
  * Puro DOM: nunca chama Engine/Sensibilidade. Renderiza sidebar 100% a partir
  * de window.FILTERS_CONFIG (ids de filtro nunca hardcoded, exceto 'aparencia',
  * que vive no card lúdico e não aparece na sidebar).
- * API: window.UI = { init, sync, render, openMetodologia, closeMetodologia }
+ * API: window.UI = { init, sync, render, renderAnalises, openMetodologia, closeMetodologia }
  */
 (function () {
   'use strict';
@@ -585,6 +585,71 @@
     });
   }
 
+  // ---------- análises assíncronas (Sobol global + atribuição Shapley) ----------
+
+  function pct0(x) { return (num(x) ? Math.round(x * 100) : 0) + '%'; }
+
+  /**
+   * Substitui #insights-list pelos índices globais (Sobol) e preenche
+   * #funil-atribuicao com a atribuição Shapley por filtro.
+   * Dados já computados quem fornece (main.js); UI só renderiza.
+   * tolera atrib/globalSens nulos.
+   */
+  function renderAnalises(atrib, globalSens) {
+    var host = $('#insights-list');
+    if (host) {
+      while (host.firstChild) host.removeChild(host.firstChild);
+      var list = (Array.isArray(globalSens) ? globalSens : []).slice(0, 4);
+      if (!list.length) {
+        host.appendChild(make('li', 'insights-empty', 'Nenhum filtro restritivo ativo.'));
+      } else {
+        list.forEach(function (entry) {
+          entry = entry || {};
+          var st = num(entry.S_T) ? entry.S_T : 0;
+          var s = num(entry.S) ? entry.S : 0;
+          var li = make('li', 'insight');
+          li.appendChild(make('span', 'insight-name', entry.label || entry.id || '—'));
+          li.appendChild(make('span', 'insight-impact', pct0(st)));
+          var bar = make('div', 'insight-bar');
+          var inner = make('span');
+          inner.style.width = clamp(st, 0, 1) * 100 + '%';
+          bar.appendChild(inner);
+          li.appendChild(bar);
+          var txt = make('p', 'texto', 'S_T ' + pct0(st) + ' · S ' + pct0(s) + ' · interação ' + pct0(st - s));
+          txt.style.gridColumn = '1 / -1';
+          li.appendChild(txt);
+          host.appendChild(li);
+        });
+      }
+    }
+
+    var atr = $('#funil-atribuicao');
+    if (!atr) return;
+    while (atr.firstChild) atr.removeChild(atr.firstChild);
+    var itens = (atrib && Array.isArray(atrib.itens) ? atrib.itens : []).slice(0, 8);
+    if (!itens.length) {
+      atr.appendChild(make('div', 'insights-empty', 'Nenhum filtro ativo para atribuir.'));
+      return;
+    }
+    var maxMedia = 0;
+    itens.forEach(function (it) { if (it && num(it.media) && it.media > maxMedia) maxMedia = it.media; });
+    itens.forEach(function (it) {
+      it = it || {};
+      var media = num(it.media) ? it.media : 0;
+      var row = make('div', 'atribuicao-row');
+      row.appendChild(make('span', 'atribuicao-label', it.label || it.id || '—'));
+      var val = fmtInt.format(Math.round(media));
+      if (num(it.desvio)) val += ' (' + fmtInt.format(Math.round(it.desvio)) + ')';
+      row.appendChild(make('span', 'atribuicao-valor', val));
+      var bar = make('div', 'bar');
+      var inner = make('span');
+      inner.style.width = (maxMedia > 0 ? clamp(media / maxMedia, 0, 1) * 100 : 0) + '%';
+      bar.appendChild(inner);
+      row.appendChild(bar);
+      atr.appendChild(row);
+    });
+  }
+
   // ---------- tabela RA ----------
 
   function ensureRaHead() {
@@ -953,6 +1018,7 @@
     init: init,
     sync: sync,
     render: render,
+    renderAnalises: renderAnalises,
     openMetodologia: openMetodologia,
     closeMetodologia: closeMetodologia
   };
