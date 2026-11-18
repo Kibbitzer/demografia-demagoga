@@ -245,3 +245,137 @@ Dependências: 2 depende de 1; 3 e 4 dependem de 2; 5 depende de 3–4. Um integ
 ## 11. Aprovação
 
 Responder `build` para executar as fases 1–6 via orchestrator. Ajustes de escopo (ex.: Tailwind CDN, arquivo único) devem ser ditos antes.
+
+---
+---
+
+# PARTE II — Plano de correção metodológica
+
+**Estado da Parte I:** implementada e publicada. Não reexecutar. Esta parte é o plano novo.
+
+**Diagnóstico de origem:** `paper_metodologia.md` (críticas 4.1–4.13 e propostas §5). Objetivo: converter o KPI de "número preciso" para "cenário com incerteza declarada, linhagem e validação".
+
+**Princípio de migração:** manter o motor atual como `modo='legado'`; construir `modo='calibrado'` em paralelo; comparação lado a lado antes de trocar o padrão. Nenhuma mudança que apague o modo legado sem aprovação.
+
+## 12. Priorização
+
+| Prioridade | Item | Depende de microdados? | Ganho |
+| :--- | :--- | :--- | :--- |
+| P0.1 | Propagar incerteza das faixas A/B/C para IC95 no KPI | Não | Alto |
+| P0.2 | Rótulo de cenário/escopo/modo junto ao KPI | Não | Alto |
+| P0.3 | Funil com atribuição invariante à ordem (Shapley) | Não | Médio |
+| P0.4 | Sensibilidade global (Sobol) substituindo Top4 local | Não | Alto |
+| P0.5 | Testes de margem, monotonicidade e invariância | Não | Alto |
+| P1.1 | DAG e registro de independências/colisores | Não | Alto |
+| P1.2 | Junta renda×escolaridade via IPF, substituir reweight ad hoc | Margens 2-vias publicadas | Alto |
+| P1.3 | Correção de erro de medida em altura/IMC (Vigitel/PNS) | Não (parâmetros publicados) | Médio |
+| P1.4 | Separar construtos IST (C1 crônica — C2 histórico — ativa) | Não | Alto |
+| P2.1 | Modelo hierárquico bayesiano com efeito RA/idade | Microdados ou tabelas 2-vias | Alto |
+| P2.2 | Pequenas áreas (Rao) para Varjão/Fercal/SIA | Microdados | Médio |
+| P2.3 | Imputação múltipla de comportamentos ausentes | Microdados | Médio |
+| P2.4 | Backtest contra microdados PNAD/Censo liberados | Microdados | Alto |
+
+## 13. Fase P0 — correções sem dados novos
+
+### 13.1 Propagação de incerteza
+- Arquivo novo: `assets/js/incerteza.js`; API `window.Incerteza = { amostrar(state, n), resumo(state) }`.
+- Para cada `TAXAS.*` com `min`/`max`: Beta(α,β) com média em `p` e dispersão definida pela faixa; para `altura`/`aparencia`: Normal(μ,σ) com μ perturbado pelo erro de medida.
+- `amostrar()` chama `Engine.calcular` com tabela de taxas perturbada; não altera o motor.
+- `resumo()` → `{ median, p025, p975, p05, p95 }` sobre `total`, `porRA`, `umEmCadaHabitantes`.
+- Render: KPI mostra mediana e faixa 95%; gráfico RA com barras de erro; pct com 1 casa, não 2.
+- `n=2000` por padrão; Web Worker se `n>5000`.
+
+### 13.2 Rótulos e semântica
+- `index.html`: badge de cenário ao lado do KPI: `IST C1/C2 · renda familiar/per capita · modo correlacionado/independente`.
+- Modal: bloco "Como ler este número" com base canônica (adultos 18–80) e aviso de cenário ilustrativo.
+- `ui.js`: `#kpi-pct` passa a 1 casa decimal; remover falsa precisão de 3 algarismos.
+
+### 13.3 Funil invariante
+- `analytics.js`: manter `Funil.calcular(state)`; acrescentar `Funil.atribuicao(state)` com valores de Shapley: média da perda marginal de cada filtro sobre 100 permutações com seed determinístico.
+- `charts.js`: `renderFunil` desenha barras de média + desvio entre permutações.
+- Texto do card: "Atribuição por Shapley; a ordem visual não afeta os valores."
+
+### 13.4 Sensibilidade global
+- `sensibilidade.js`: manter `top()` (legado) e acrescentar `global(state)`:
+  - 2048 combinações de filtros ativos (sequência Sobol' com seed simples, sem lib externa);
+  - índice de 1ª ordem `S_i` e total `S_Ti`;
+  - saída `[{id,label,S,S_T,rank}]`.
+- UI: card "Filtros de maior impacto" mostra `S_T` com barra; legenda explica que `S_T−S` mede interação.
+- Teste: `scripts/test-sensibilidade-global.mjs` — soma de `S` ≤ 1; `S_T ≥ S`; ordem estável em 3 seeds.
+
+### 13.5 Testes P0
+- `scripts/test-incerteza.mjs`: IC contém a mediana; p025 ≤ median ≤ p975; determinismo por seed.
+- `scripts/test-engine.mjs`: invariância de ordem do funil (desvio ≤ 2%) e conservação da soma por RA sob perturbação.
+- Critério: testes verdes; `file://` sem erro; recompute < 150 ms com n=2000.
+
+## 14. Fase P1 — estrutura estatística
+
+### 14.1 DAG e contrato de independência
+- Arquivo: `docs/dag.md` com nós: idade, sexo, RA, renda, escolaridade, raça, civil, filhos, fumo, IMC, IST, antecedentes, infidelidade, altura.
+- Arestas declaradas; marcar colisores e variáveis latentes (nutrição, contexto familiar, acesso a saúde).
+- Cada `FILTERS_CONFIG[].independencias` lista pares tratados como independentes e justificativa.
+- Regra: novo filtro só entra se tiver `independencias` preenchido.
+
+### 14.2 Junta consistente (IPF)
+- `scripts/build_joint.py` (numpy/scipy): entrada = marginais de `TAXAS` + tabelas 2-vias publicadas (`rendaEduBase`, `estadoCivilFilhos`, `racaPorRenda`) + margens por RA.
+- Saída: `data/joint_calibrado.json` com pesos log-lineares; erro de margem ≤ 1%.
+- `engine_v2.js`: substitui `juntaRD`/`civilFilhoProb`/`fatorRaca` por consulta à tabela calibrada; `modo='calibrado'` seleciona.
+- `scripts/validate_margins.py`: falha se marginal reconstruída divergir > 1% da publicada.
+- Teste A/B: cenários do `test-engine.mjs` rodam nos dois modos; nenhum total negativo/NaN.
+
+### 14.3 Erro de medida e construtos
+- Altura: substituir `(μ,σ)` pontuais por distribuição preditiva; parâmetro de correção do auto-relato (Vigitel/Malta 2010); nota em `taxas.js`.
+- Tabagismo/obesidade: declarar período de referência em `label`/`ajuda`.
+- IST: `istCenario` → `istDefinicao` com `cronica` (C1), `historicoAmplo` (C2), `infecciosaAtual` (novo); manter aliases.
+- Infidelidade/antecedentes: badge `C` visível no filtro e no KPI.
+
+## 15. Fase P2 — dados e modelo hierárquico
+
+### 15.1 Aquisição
+- `scripts/fetch_ibge.py`: SIDRA (Censo 2022, PNAD Contínua 2022/2023, PNS 2019) com `ano`, `tabela`, `variavel` parametrizados; salvar URL e data de acesso.
+- PDAD/IPEDF: verificar microdados; se indisponíveis, usar tabelas 2-vias publicadas e registrar limitação.
+- `data/fontes.json`: linhagem (nome, nível DF/CO/BR, ano, URL, acesso, confiança).
+
+### 15.2 Modelo hierárquico
+- `modelo_v2.js`: logit hierárquico `logit p[i,ra] = α + β_idade + γ_ra + δ_renda + ...`, `γ_ra ~ N(0, σ_ra²)`; ajuste em `scripts/fit_model.py` (PyMC/Stan) ou MAP+bootstrap.
+- Priors: Beta(2,8) para taxas raras; Normal(0,0.5) para coeficientes; HalfNormal para σ_ra.
+- Saída: `data/posterior.json`; browser só interpola amostras.
+- RAs pequenas: encolhimento para média DF; IC por RA na tabela.
+
+### 15.3 Validação
+- Backtest: treino/teste em microdados; comparar contagens agregadas previstas vs observadas por RA×idade×sexo.
+- Métricas: erro absoluto mediano ≤ 5% em agregados grandes; cobertura do IC95 entre 93–97%; calibração por decil.
+- `scripts/report_validacao.py` → `docs/validacao.md`.
+
+## 16. Ordem de execução e delegação
+
+1. P0.5 → P0.1 → P0.2 → P0.3 → P0.4 (um coder por arquivo; integrador único em `engine.js`/`incerteza.js`).
+2. P1.1 → P1.2 → P1.3 → P1.4.
+3. P2.1 → P2.2 → P2.3 → P2.4.
+4. Após P2.4 verde: trocar padrão para `calibrado`, manter `legado` por 1 release.
+
+## 17. Critérios de aceite finais
+
+- [ ] KPI mostra mediana + IC95, nunca número isolado.
+- [ ] Badge declara cenário IST, base de renda, modo e ano das fontes.
+- [ ] Toda marginal publicada reproduzida com erro ≤ 1% no modo calibrado.
+- [ ] Atribuição do funil invariante à ordem (≤ 2% entre permutações).
+- [ ] `S_T ≥ S` para todos os filtros; interações quantificadas.
+- [ ] RAs pequenas têm IC e encolhimento; não recebem ponto fixo.
+- [ ] Backtest: cobertura IC95 93–97%; erro mediano ≤ 5% em agregados grandes.
+- [ ] `docs/dag.md` justifica cada independência; nenhum filtro novo sem `independencias`.
+- [ ] `data/fontes.json` cobre 100% das taxas com URL e data de acesso.
+- [ ] Testes verdes nos dois modos; `file://` sem erro; recompute < 150 ms (ou worker).
+- [ ] Modo legado permanece acessível para comparação.
+
+## 18. Riscos
+
+- Microdados PDAD podem exigir solicitação formal: Plano B é IPF sobre tabelas 2-vias, com confiança C.
+- IPF com restrições insuficientes pode fabricar dependência: exigir diagnóstico de convergência e comparação com tabela legada.
+- MCMC em browser é inviável: ajuste offline, posterior serializado.
+- Mais incerteza pode parecer "menos preciso": comunicação deve enquadrar IC como honestidade.
+- Números diferentes não são "correção" automática: só validação externa decide.
+
+## 19. Aprovação da Parte II
+
+Responder `build-method` para executar P0. Responder `build-method-all` para P0→P2. Cada fase termina com relatório de testes antes da seguinte.
