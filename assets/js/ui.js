@@ -33,7 +33,6 @@
 
   var fmtInt = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 });
   var fmt1 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  var fmt2 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   function norm(s) {
     return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -511,17 +510,44 @@
 
   // ---------- KPIs ----------
 
-  function renderKpi(res) {
+  /** Rótulo do cenário ativo: filtros com flag mostrarNoKpi, lidos do config (sem id hardcoded). */
+  function labelCenario(state) {
+    var cfgs = Array.isArray(W.FILTERS_CONFIG) ? W.FILTERS_CONFIG : [];
+    var partes = [];
+    cfgs.forEach(function (f) {
+      if (!f || !f.mostrarNoKpi) return;
+      var v = state ? state[f.id] : null;
+      if (v == null) return;
+      var vals = Array.isArray(v) ? v : [v];
+      (f.options || []).forEach(function (o) {
+        if (vals.indexOf(o.value) >= 0) partes.push(o.label);
+      });
+    });
+    return partes.length ? partes.join(' · ') : '—';
+  }
+
+  function renderKpi(res, state, inc) {
     res = res || {};
     var total = num(res.total) ? res.total : 0;
-    setText($('#kpi-total'), fmtInt.format(Math.round(total)));
-    setText($('#kpi-pct'), fmt2.format((total / BASE_DF) * 100) + '%');
+    var temInc = !!(inc && inc.total && num(inc.total.median));
+    setText($('#kpi-total'), fmtInt.format(Math.round(temInc ? inc.total.median : total)));
+    setText($('#kpi-pct'), fmt1.format((total / BASE_DF) * 100) + '%');
     var hab = num(res.umEmCadaHabitantes) && res.umEmCadaHabitantes > 0 ? res.umEmCadaHabitantes : null;
     setText($('#kpi-umemcada'), hab != null ? fmt1.format(hab) : '—');
     var grupo = num(res.umEmCada) && res.umEmCada > 0 ? res.umEmCada : null;
     setText($('#kpi-grupo'), grupo != null ? fmt1.format(grupo) : '—');
     setText($('#kpi-base'), num(res.base) ? fmtInt.format(Math.round(res.base)) : '—');
     setText($('#kpi-denom'), num(res.denominador) ? fmtInt.format(Math.round(res.denominador)) : '—');
+    setText($('#kpi-cenario'), labelCenario(state));
+    var ic = $('#kpi-ic');
+    if (ic) {
+      if (inc && inc.total && num(inc.total.p025) && num(inc.total.p975)) {
+        ic.textContent = 'IC95: ' + fmtInt.format(Math.round(inc.total.p025)) + ' – ' + fmtInt.format(Math.round(inc.total.p975));
+        ic.removeAttribute('hidden');
+      } else {
+        ic.setAttribute('hidden', '');
+      }
+    }
     var zero = $('#aviso-zero');
     if (zero) {
       if (total < 0.5) zero.removeAttribute('hidden');
@@ -698,8 +724,8 @@
 
   // ---------- render ----------
 
-  function render(res, state, insights) {
-    renderKpi(res);
+  function render(res, state, insights, inc) {
+    renderKpi(res, state, inc);
     renderInsights(insights);
     renderRa(res);
     if (state) sync(state);

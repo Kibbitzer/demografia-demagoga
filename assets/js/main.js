@@ -57,7 +57,11 @@
     atualizarTitulo();
     var res = Engine.calcular(state);
     var ins = Sensibilidade.top(state, 4);
-    UI.render(res, state, ins);
+    var inc = null;
+    if (window.Incerteza && typeof Incerteza.resumo === 'function') {
+      try { inc = Incerteza.resumo(state, 600); } catch (e) { inc = null; }
+    }
+    UI.render(res, state, ins, inc);
     Charts.renderRA(res.porRA);
     if (state && window.Funil && Charts.renderFunil) Charts.renderFunil(Funil.calcular(state));
     if (state.aparencia.ativo) Charts.renderAparencia(state.aparencia.notaMinima);

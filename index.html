@@ -55,12 +55,14 @@
             <span class="kpi-badge"><strong id="kpi-pct">—</strong> da população do DF</span>
             <span class="kpi-badge">1 em cada <strong id="kpi-umemcada">—</strong> habitantes</span>
             <span class="kpi-badge">1 em cada <strong id="kpi-grupo">—</strong> do grupo-alvo</span>
+            <span class="kpi-badge" id="kpi-cenario"></span>
           </div>
         </div>
         <div class="hero-sub">
           <span class="hero-sub-item">Adultos 18+ no DF: <strong id="kpi-base">—</strong></span>
           <span class="hero-sub-sep" aria-hidden="true">·</span>
           <span class="hero-sub-item">Público-alvo compatível (18+): <strong id="kpi-denom">—</strong></span>
+          <span id="kpi-ic" class="kpi-ic" aria-live="polite"></span>
         </div>
         <div id="aviso-zero" class="aviso-zero" hidden>
           <strong>Nenhum resultado com esses filtros.</strong>
@@ -200,6 +202,7 @@
   <script src="assets/js/engine.js"></script>
   <script src="assets/js/sensibilidade.js"></script>
   <script src="assets/js/analytics.js"></script>
+  <script src="assets/js/incerteza.js"></script>
   <script src="assets/vendor/chart.umd.min.js"></script>
   <script src="assets/js/charts.js"></script>
   <script src="assets/js/ui.js"></script>

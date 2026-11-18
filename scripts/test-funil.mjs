@@ -144,6 +144,39 @@ for (const c of ['c1', 'c2', undefined]) {
   ok(ids.indexOf('ist') >= 0, `istCenario=${c}: estágio 'ist' presente`);
 }
 
+// ---------- 4) atribuicao (Shapley): eficiência, estrutura, determinismo ----------
+ok(typeof FUNIL.atribuicao === 'function', 'analytics.js: window.Funil.atribuicao definido');
+
+function neutroManual(st) {
+  // espelha Funil: eixos estruturais/seletors do usuário + defaults neutros do config
+  const s = E.normalizeState(st);
+  return E.normalizeState({
+    generoUsuario: s.generoUsuario, generoBuscado: s.generoBuscado,
+    orientacaoAlvo: s.orientacaoAlvo, istCenario: s.istCenario,
+    rendaEscopo: s.rendaEscopo, modoCalculo: s.modoCalculo,
+  });
+}
+
+for (const [rotulo, st] of casos) {
+  const a = FUNIL.atribuicao(st);
+  ok(a && Array.isArray(a.itens) && [a.soma, a.neutro, a.final].every(Number.isFinite),
+    `atribuicao ${rotulo}: retorna {itens,soma,neutro,final}`);
+  ok(relDiff(a.final, E.calcular(st).total) <= 1e-12, `atribuicao ${rotulo}: final = Engine.calcular(state).total`);
+  ok(relDiff(a.neutro, E.calcular(neutroManual(st)).total) <= 1e-12, `atribuicao ${rotulo}: neutro = total do estado neutro`);
+  ok(relDiff(a.soma, a.neutro - a.final) <= 1e-9,
+    `atribuicao ${rotulo}: eficiência — soma das médias = neutro − final (${a.soma} vs ${a.neutro - a.final})`);
+  ok(relDiff(a.itens.reduce((x, e) => x + e.media, 0), a.soma) <= 1e-9, `atribuicao ${rotulo}: soma bate com Σ media`);
+  const idsA = a.itens.map(e => e.id);
+  ok(JSON.stringify(idsA) === JSON.stringify(esperados(st).slice(2).sort((x, y) => {
+    const mx = a.itens.find(e => e.id === x).media, my = a.itens.find(e => e.id === y).media;
+    return my - mx || (x < y ? -1 : x > y ? 1 : 0);
+  })), `atribuicao ${rotulo}: itens = filtros ativos, ordenados por media desc (${idsA.join(',')})`);
+  ok(a.itens.every(e => { const cfg = F.find(f => f.id === e.id); return typeof e.media === 'number' && cfg && e.label === cfg.label; }),
+    `atribuicao ${rotulo}: entry {id,label,media} com label do config`);
+  ok(JSON.stringify(FUNIL.atribuicao(st)) === JSON.stringify(a), `atribuicao ${rotulo}: determinismo (seed fixa)`);
+}
+ok(FUNIL.atribuicao({}).itens.length === 0 && FUNIL.atribuicao({}).soma === 0, 'atribuicao neutro: sem filtros ativos ⇒ itens vazio, soma 0');
+
 report();
 
 function report() {

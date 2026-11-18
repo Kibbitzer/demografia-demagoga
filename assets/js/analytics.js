@@ -1,7 +1,7 @@
 /**
  * analytics.js — Funil de redução da calculadora demográfica DF.
  * Puro: só depende de window.Engine / window.FILTERS_CONFIG. Sem DOM, sem fetch.
- * API: window.Funil = { calcular(state) }
+ * API: window.Funil = { calcular(state), atribuicao(state) }
  *
  * Estágios: [base (adultos 18–80, ambos os sexos, todas as orientações),
  *            publico (gênero + orientação), ...filtros ativos na ordem de FILTERS_CONFIG].
@@ -141,5 +141,65 @@
     return o;
   }
 
-  W.Funil = { calcular: calcular };
+  // ---------- atribuição por Shapley (PLAN §13.3) ----------
+  // Perda marginal de cada filtro ativo, média sobre N_PERM permutações (Fisher–Yates,
+  // mulberry32 seed 20261118). A soma telescópica por permutação vale sempre
+  // totalNeutro − totalFinal ⇒ eficiência exata: soma das médias = totalNeutro − totalFinal.
+  var SEED = 20261118;
+  var N_PERM = 100;
+
+  function mulberry32(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function atribuicao(state) {
+    var vazio = { itens: [], soma: 0, neutro: 0, final: 0 };
+    if (!W.Engine || !W.Engine.calcular || !W.Engine.normalizeState) return vazio;
+    var s = W.Engine.normalizeState(state);
+    var cfgs = W.FILTERS_CONFIG || [], N = neutro(s), i, j;
+    var ativos = [];
+    for (i = 0; i < cfgs.length; i++) {
+      var cfg = cfgs[i];
+      if (ESTRUTURAIS[cfg.id] || cfg.structural) continue;
+      if (isAtivo(cfg, s[cfg.id])) ativos.push(cfg);
+    }
+    var neutroTotal = totalDe(N), finalTotal = totalDe(s);
+    var res = { itens: [], soma: 0, neutro: neutroTotal, final: finalTotal };
+    if (!ativos.length) { res.soma = neutroTotal - finalTotal; return res; }
+
+    var rng = mulberry32(SEED);
+    var acc = new Array(ativos.length);
+    for (i = 0; i < ativos.length; i++) acc[i] = 0;
+    var perm = new Array(ativos.length);
+    for (j = 0; j < N_PERM; j++) {
+      for (i = 0; i < ativos.length; i++) perm[i] = i;
+      for (i = ativos.length - 1; i > 0; i--) { // Fisher–Yates
+        var r = Math.floor(rng() * (i + 1)), tmp = perm[i]; perm[i] = perm[r]; perm[r] = tmp;
+      }
+      var cur = deepCopy(N), prev = neutroTotal;
+      for (i = 0; i < perm.length; i++) {
+        var idx = perm[i];
+        cur[ativos[idx].id] = deepCopy(s[ativos[idx].id]);
+        var t = totalDe(cur);
+        acc[idx] += prev - t; // perda marginal de entrar o filtro nesta ordem
+        prev = t;
+      }
+    }
+    for (i = 0; i < ativos.length; i++) {
+      var media = acc[i] / N_PERM;
+      res.itens.push({ id: ativos[i].id, label: ativos[i].label, media: media });
+      res.soma += media;
+    }
+    res.itens.sort(function (a, b) { return b.media - a.media || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0); });
+    return res;
+  }
+
+  W.Funil = { calcular: calcular, atribuicao: atribuicao };
 })();

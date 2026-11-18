@@ -59,6 +59,7 @@
       category: 'Demografia & Compatibilidade',
       type: 'select',
       structural: true,
+      mostrarNoKpi: true,
       options: [
         { value: 'correlacionado', label: 'Correlacionado (matrizes)', probKey: null },
         { value: 'independente', label: 'Independente (produto)', probKey: null }
@@ -156,6 +157,7 @@
       category: 'Socioeconômico',
       type: 'select',
       structural: true,
+      mostrarNoKpi: true,
       options: [
         { value: 'familiar', label: 'Familiar total', probKey: null },
         { value: 'perCapita', label: 'Per capita', probKey: null }
@@ -306,6 +308,7 @@
       category: 'Comportamental',
       type: 'select',
       structural: true,
+      mostrarNoKpi: true,
       options: [
         { value: 'c2', label: 'C2 — qualquer IST', probKey: null },
         { value: 'c1', label: 'C1 — só crônicas', probKey: null }
